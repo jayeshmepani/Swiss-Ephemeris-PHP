@@ -6,7 +6,6 @@ namespace SwissEph\FFI;
 
 use FFI;
 use RuntimeException;
-use InvalidArgumentException;
 
 /**
  * SwissEphFFI - Complete FFI binding for Swiss Ephemeris C Library
@@ -20,30 +19,13 @@ class SwissEphFFI
     private static ?FFI $ffi = null;
     private static ?string $libraryPath = null;
     
-    // Calculation flags
-    public const SEFLG_SWIEPH = 1;
-    public const SEFLG_JPLEPH = 2;
-    public const SEFLG_MOSEPH = 4;
-    public const SEFLG_TRUEPOS = 8;
-    public const SEFLG_J2000 = 16;
-    public const SEFLG_NONUT = 32;
-    public const SEFLG_SPEED3 = 64;
-    public const SEFLG_SPEED = 128;
-    public const SEFLG_NOGDEFL = 256;
-    public const SEFLG_NOABERR = 512;
-    public const SEFLG_EQUATORIAL = 1024;
-    public const SEFLG_XYZ = 2048;
-    public const SEFLG_RADIANS = 4096;
-    public const SEFLG_BARYCTR = 8192;
-    public const SEFLG_HELCTR = 16384;
-    public const SEFLG_ORBITAL = 32768;
-    public const SEFLG_ICRS = 65536;
-    public const SEFLG_DPSIDEPS_1980 = 131072;
-    public const SEFLG_JPLHOR = 262144;
-    public const SEFLG_JPLHOR_OPT = 524288;
-    public const SEFLG_SIDEREAL = 1048576;
-    
-    // Planet IDs
+    // ======== CONSTANTS ========
+    public const SE_AUNIT_TO_KM = (149597870.700);
+    public const SE_AUNIT_TO_LIGHTYEAR = (1.0/63241.07708427);
+    public const SE_AUNIT_TO_PARSEC = (1.0/206264.8062471);
+    public const SE_JUL_CAL = 0;
+    public const SE_GREG_CAL = 1;
+    public const SE_ECL_NUT = -1;
     public const SE_SUN = 0;
     public const SE_MOON = 1;
     public const SE_MERCURY = 2;
@@ -68,8 +50,311 @@ class SwissEphFFI
     public const SE_INTP_APOG = 21;
     public const SE_INTP_PERG = 22;
     public const SE_NPLANETS = 23;
-    
-    // House systems
+    public const SE_PLMOON_OFFSET = 9000;
+    public const SE_AST_OFFSET = 10000;
+    public const SE_VARUNA = (self::SE_AST_OFFSET + 20000);
+    public const SE_FICT_OFFSET = 40;
+    public const SE_FICT_OFFSET_1 = 39;
+    public const SE_FICT_MAX = 999;
+    public const SE_NFICT_ELEM = 15;
+    public const SE_COMET_OFFSET = 1000;
+    public const SE_NALL_NAT_POINTS = (self::SE_NPLANETS + self::SE_NFICT_ELEM);
+    public const SE_CUPIDO = 40;
+    public const SE_HADES = 41;
+    public const SE_ZEUS = 42;
+    public const SE_KRONOS = 43;
+    public const SE_APOLLON = 44;
+    public const SE_ADMETOS = 45;
+    public const SE_VULKANUS = 46;
+    public const SE_POSEIDON = 47;
+    public const SE_ISIS = 48;
+    public const SE_NIBIRU = 49;
+    public const SE_HARRINGTON = 50;
+    public const SE_NEPTUNE_LEVERRIER = 51;
+    public const SE_NEPTUNE_ADAMS = 52;
+    public const SE_PLUTO_LOWELL = 53;
+    public const SE_PLUTO_PICKERING = 54;
+    public const SE_VULCAN = 55;
+    public const SE_WHITE_MOON = 56;
+    public const SE_PROSERPINA = 57;
+    public const SE_WALDEMATH = 58;
+    public const SE_FIXSTAR = -10;
+    public const SE_ASC = 0;
+    public const SE_MC = 1;
+    public const SE_ARMC = 2;
+    public const SE_VERTEX = 3;
+    public const SE_EQUASC = 4;
+    public const SE_COASC1 = 5;
+    public const SE_COASC2 = 6;
+    public const SE_POLASC = 7;
+    public const SE_NASCMC = 8;
+    public const SEFLG_JPLEPH = 1;
+    public const SEFLG_SWIEPH = 2;
+    public const SEFLG_MOSEPH = 4;
+    public const SEFLG_HELCTR = 8;
+    public const SEFLG_TRUEPOS = 16;
+    public const SEFLG_J2000 = 32;
+    public const SEFLG_NONUT = 64;
+    public const SEFLG_SPEED3 = 128;
+    public const SEFLG_SPEED = 256;
+    public const SEFLG_NOGDEFL = 512;
+    public const SEFLG_NOABERR = 1024;
+    public const SEFLG_ASTROMETRIC = (self::SEFLG_NOABERR|self::SEFLG_NOGDEFL);
+    public const SEFLG_EQUATORIAL = (2*1024);
+    public const SEFLG_XYZ = (4*1024);
+    public const SEFLG_RADIANS = (8*1024);
+    public const SEFLG_BARYCTR = (16*1024);
+    public const SEFLG_TOPOCTR = (32*1024);
+    public const SEFLG_ORBEL_AA = self::SEFLG_TOPOCTR;
+    public const SEFLG_TROPICAL = (0);
+    public const SEFLG_SIDEREAL = (64*1024);
+    public const SEFLG_ICRS = (128*1024);
+    public const SEFLG_DPSIDEPS_1980 = (256*1024);
+    public const SEFLG_JPLHOR = self::SEFLG_DPSIDEPS_1980;
+    public const SEFLG_JPLHOR_APPROX = (512*1024);
+    public const SEFLG_CENTER_BODY = (1024*1024);
+    public const SEFLG_TEST_PLMOON = (2*1024*1024 | self::SEFLG_J2000 | self::SEFLG_ICRS | self::SEFLG_HELCTR | self::SEFLG_TRUEPOS);
+    public const SE_SIDBITS = 256;
+    public const SE_SIDBIT_ECL_T0 = 256;
+    public const SE_SIDBIT_SSY_PLANE = 512;
+    public const SE_SIDBIT_USER_UT = 1024;
+    public const SE_SIDBIT_ECL_DATE = 2048;
+    public const SE_SIDBIT_NO_PREC_OFFSET = 4096;
+    public const SE_SIDBIT_PREC_ORIG = 8192;
+    public const SE_SIDM_FAGAN_BRADLEY = 0;
+    public const SE_SIDM_LAHIRI = 1;
+    public const SE_SIDM_DELUCE = 2;
+    public const SE_SIDM_RAMAN = 3;
+    public const SE_SIDM_USHASHASHI = 4;
+    public const SE_SIDM_KRISHNAMURTI = 5;
+    public const SE_SIDM_DJWHAL_KHUL = 6;
+    public const SE_SIDM_YUKTESHWAR = 7;
+    public const SE_SIDM_JN_BHASIN = 8;
+    public const SE_SIDM_BABYL_KUGLER1 = 9;
+    public const SE_SIDM_BABYL_KUGLER2 = 10;
+    public const SE_SIDM_BABYL_KUGLER3 = 11;
+    public const SE_SIDM_BABYL_HUBER = 12;
+    public const SE_SIDM_BABYL_ETPSC = 13;
+    public const SE_SIDM_ALDEBARAN_15TAU = 14;
+    public const SE_SIDM_HIPPARCHOS = 15;
+    public const SE_SIDM_SASSANIAN = 16;
+    public const SE_SIDM_GALCENT_0SAG = 17;
+    public const SE_SIDM_J2000 = 18;
+    public const SE_SIDM_J1900 = 19;
+    public const SE_SIDM_B1950 = 20;
+    public const SE_SIDM_SURYASIDDHANTA = 21;
+    public const SE_SIDM_SURYASIDDHANTA_MSUN = 22;
+    public const SE_SIDM_ARYABHATA = 23;
+    public const SE_SIDM_ARYABHATA_MSUN = 24;
+    public const SE_SIDM_SS_REVATI = 25;
+    public const SE_SIDM_SS_CITRA = 26;
+    public const SE_SIDM_TRUE_CITRA = 27;
+    public const SE_SIDM_TRUE_REVATI = 28;
+    public const SE_SIDM_TRUE_PUSHYA = 29;
+    public const SE_SIDM_GALCENT_RGILBRAND = 30;
+    public const SE_SIDM_GALEQU_IAU1958 = 31;
+    public const SE_SIDM_GALEQU_TRUE = 32;
+    public const SE_SIDM_GALEQU_MULA = 33;
+    public const SE_SIDM_GALALIGN_MARDYKS = 34;
+    public const SE_SIDM_TRUE_MULA = 35;
+    public const SE_SIDM_GALCENT_MULA_WILHELM = 36;
+    public const SE_SIDM_ARYABHATA_522 = 37;
+    public const SE_SIDM_BABYL_BRITTON = 38;
+    public const SE_SIDM_TRUE_SHEORAN = 39;
+    public const SE_SIDM_GALCENT_COCHRANE = 40;
+    public const SE_SIDM_GALEQU_FIORENZA = 41;
+    public const SE_SIDM_VALENS_MOON = 42;
+    public const SE_SIDM_LAHIRI_1940 = 43;
+    public const SE_SIDM_LAHIRI_VP285 = 44;
+    public const SE_SIDM_KRISHNAMURTI_VP291 = 45;
+    public const SE_SIDM_LAHIRI_ICRC = 46;
+    public const SE_SIDM_USER = 255;
+    public const SE_NSIDM_PREDEF = 47;
+    public const SE_NODBIT_MEAN = 1;
+    public const SE_NODBIT_OSCU = 2;
+    public const SE_NODBIT_OSCU_BAR = 4;
+    public const SE_NODBIT_FOPOINT = 256;
+    public const SEFLG_DEFAULTEPH = self::SEFLG_SWIEPH;
+    public const SE_MAX_STNAME = 256;
+    public const SE_ECL_CENTRAL = 1;
+    public const SE_ECL_NONCENTRAL = 2;
+    public const SE_ECL_TOTAL = 4;
+    public const SE_ECL_ANNULAR = 8;
+    public const SE_ECL_PARTIAL = 16;
+    public const SE_ECL_ANNULAR_TOTAL = 32;
+    public const SE_ECL_HYBRID = 32;
+    public const SE_ECL_PENUMBRAL = 64;
+    public const SE_ECL_ALLTYPES_SOLAR = (self::SE_ECL_CENTRAL|self::SE_ECL_NONCENTRAL|self::SE_ECL_TOTAL|self::SE_ECL_ANNULAR|self::SE_ECL_PARTIAL|self::SE_ECL_ANNULAR_TOTAL);
+    public const SE_ECL_ALLTYPES_LUNAR = (self::SE_ECL_TOTAL|self::SE_ECL_PARTIAL|self::SE_ECL_PENUMBRAL);
+    public const SE_ECL_VISIBLE = 128;
+    public const SE_ECL_MAX_VISIBLE = 256;
+    public const SE_ECL_1ST_VISIBLE = 512;
+    public const SE_ECL_PARTBEG_VISIBLE = 512;
+    public const SE_ECL_2ND_VISIBLE = 1024;
+    public const SE_ECL_TOTBEG_VISIBLE = 1024;
+    public const SE_ECL_3RD_VISIBLE = 2048;
+    public const SE_ECL_TOTEND_VISIBLE = 2048;
+    public const SE_ECL_4TH_VISIBLE = 4096;
+    public const SE_ECL_PARTEND_VISIBLE = 4096;
+    public const SE_ECL_PENUMBBEG_VISIBLE = 8192;
+    public const SE_ECL_PENUMBEND_VISIBLE = 16384;
+    public const SE_ECL_OCC_BEG_DAYLIGHT = 8192;
+    public const SE_ECL_OCC_END_DAYLIGHT = 16384;
+    public const SE_ECL_ONE_TRY = (32*1024);
+    public const SE_CALC_RISE = 1;
+    public const SE_CALC_SET = 2;
+    public const SE_CALC_MTRANSIT = 4;
+    public const SE_CALC_ITRANSIT = 8;
+    public const SE_BIT_DISC_CENTER = 256;
+    public const SE_BIT_DISC_BOTTOM = 8192;
+    public const SE_BIT_GEOCTR_NO_ECL_LAT = 128;
+    public const SE_BIT_NO_REFRACTION = 512;
+    public const SE_BIT_CIVIL_TWILIGHT = 1024;
+    public const SE_BIT_NAUTIC_TWILIGHT = 2048;
+    public const SE_BIT_ASTRO_TWILIGHT = 4096;
+    public const SE_BIT_FIXED_DISC_SIZE = 16384;
+    public const SE_BIT_FORCE_SLOW_METHOD = 32768;
+    public const SE_BIT_HINDU_RISING = (self::SE_BIT_DISC_CENTER|self::SE_BIT_NO_REFRACTION|self::SE_BIT_GEOCTR_NO_ECL_LAT);
+    public const SE_ECL2HOR = 0;
+    public const SE_EQU2HOR = 1;
+    public const SE_HOR2ECL = 0;
+    public const SE_HOR2EQU = 1;
+    public const SE_TRUE_TO_APP = 0;
+    public const SE_APP_TO_TRUE = 1;
+    public const SE_DE_NUMBER = 431;
+    public const SE_FNAME_DE200 = "de200.eph";
+    public const SE_FNAME_DE403 = "de403.eph";
+    public const SE_FNAME_DE404 = "de404.eph";
+    public const SE_FNAME_DE405 = "de405.eph";
+    public const SE_FNAME_DE406 = "de406.eph";
+    public const SE_FNAME_DE431 = "de431.eph";
+    public const SE_FNAME_DFT = self::SE_FNAME_DE431;
+    public const SE_FNAME_DFT2 = self::SE_FNAME_DE406;
+    public const SE_STARFILE_OLD = "fixstars.cat";
+    public const SE_STARFILE = "sefstars.txt";
+    public const SE_ASTNAMFILE = "seasnam.txt";
+    public const SE_FICTFILE = "seorbel.txt";
+    public const SE_EPHE_PATH = ".:/users/ephe2/:/users/ephe/";
+    public const SE_SPLIT_DEG_ROUND_SEC = 1;
+    public const SE_SPLIT_DEG_ROUND_MIN = 2;
+    public const SE_SPLIT_DEG_ROUND_DEG = 4;
+    public const SE_SPLIT_DEG_ZODIACAL = 8;
+    public const SE_SPLIT_DEG_NAKSHATRA = 1024;
+    public const SE_SPLIT_DEG_KEEP_SIGN = 16;
+    public const SE_SPLIT_DEG_KEEP_DEG = 32;
+    public const SE_HELIACAL_RISING = 1;
+    public const SE_HELIACAL_SETTING = 2;
+    public const SE_MORNING_FIRST = self::SE_HELIACAL_RISING;
+    public const SE_EVENING_LAST = self::SE_HELIACAL_SETTING;
+    public const SE_EVENING_FIRST = 3;
+    public const SE_MORNING_LAST = 4;
+    public const SE_ACRONYCHAL_RISING = 5;
+    public const SE_ACRONYCHAL_SETTING = 6;
+    public const SE_COSMICAL_SETTING = self::SE_ACRONYCHAL_SETTING;
+    public const SE_HELFLAG_LONG_SEARCH = 128;
+    public const SE_HELFLAG_HIGH_PRECISION = 256;
+    public const SE_HELFLAG_OPTICAL_PARAMS = 512;
+    public const SE_HELFLAG_NO_DETAILS = 1024;
+    public const SE_HELFLAG_SEARCH_1_PERIOD = (1 << 11);
+    public const SE_HELFLAG_VISLIM_DARK = (1 << 12);
+    public const SE_HELFLAG_VISLIM_NOMOON = (1 << 13);
+    public const SE_HELFLAG_VISLIM_PHOTOPIC = (1 << 14);
+    public const SE_HELFLAG_VISLIM_SCOTOPIC = (1 << 15);
+    public const SE_HELFLAG_AV = (1 << 16);
+    public const SE_HELFLAG_AVKIND_VR = (1 << 16);
+    public const SE_HELFLAG_AVKIND_PTO = (1 << 17);
+    public const SE_HELFLAG_AVKIND_MIN7 = (1 << 18);
+    public const SE_HELFLAG_AVKIND_MIN9 = (1 << 19);
+    public const SE_HELFLAG_AVKIND = (self::SE_HELFLAG_AVKIND_VR|self::SE_HELFLAG_AVKIND_PTO|self::SE_HELFLAG_AVKIND_MIN7|self::SE_HELFLAG_AVKIND_MIN9);
+    public const SE_HELIACAL_LONG_SEARCH = 128;
+    public const SE_HELIACAL_HIGH_PRECISION = 256;
+    public const SE_HELIACAL_OPTICAL_PARAMS = 512;
+    public const SE_HELIACAL_NO_DETAILS = 1024;
+    public const SE_HELIACAL_SEARCH_1_PERIOD = (1 << 11);
+    public const SE_HELIACAL_VISLIM_DARK = (1 << 12);
+    public const SE_HELIACAL_VISLIM_NOMOON = (1 << 13);
+    public const SE_HELIACAL_VISLIM_PHOTOPIC = (1 << 14);
+    public const SE_HELIACAL_AVKIND_VR = (1 << 15);
+    public const SE_HELIACAL_AVKIND_PTO = (1 << 16);
+    public const SE_HELIACAL_AVKIND_MIN7 = (1 << 17);
+    public const SE_HELIACAL_AVKIND_MIN9 = (1 << 18);
+    public const SE_HELIACAL_AVKIND = (self::SE_HELFLAG_AVKIND_VR|self::SE_HELFLAG_AVKIND_PTO|self::SE_HELFLAG_AVKIND_MIN7|self::SE_HELFLAG_AVKIND_MIN9);
+    public const SE_PHOTOPIC_FLAG = 0;
+    public const SE_SCOTOPIC_FLAG = 1;
+    public const SE_MIXEDOPIC_FLAG = 2;
+    public const SE_TIDAL_DE200 = (-23.8946);
+    public const SE_TIDAL_DE403 = (-25.580);
+    public const SE_TIDAL_DE404 = (-25.580);
+    public const SE_TIDAL_DE405 = (-25.826);
+    public const SE_TIDAL_DE406 = (-25.826);
+    public const SE_TIDAL_DE421 = (-25.85);
+    public const SE_TIDAL_DE422 = (-25.85);
+    public const SE_TIDAL_DE430 = (-25.82);
+    public const SE_TIDAL_DE431 = (-25.80);
+    public const SE_TIDAL_DE441 = (-25.936);
+    public const SE_TIDAL_26 = (-26.0);
+    public const SE_TIDAL_STEPHENSON_2016 = (-25.85);
+    public const SE_TIDAL_DEFAULT = self::SE_TIDAL_DE431;
+    public const SE_TIDAL_AUTOMATIC = 999999;
+    public const SE_TIDAL_MOSEPH = self::SE_TIDAL_DE404;
+    public const SE_TIDAL_SWIEPH = self::SE_TIDAL_DEFAULT;
+    public const SE_TIDAL_JPLEPH = self::SE_TIDAL_DEFAULT;
+    public const SE_DELTAT_AUTOMATIC = (-1E-10);
+    public const SE_MODEL_DELTAT = 0;
+    public const SE_MODEL_PREC_LONGTERM = 1;
+    public const SE_MODEL_PREC_SHORTTERM = 2;
+    public const SE_MODEL_NUT = 3;
+    public const SE_MODEL_BIAS = 4;
+    public const SE_MODEL_JPLHOR_MODE = 5;
+    public const SE_MODEL_JPLHORA_MODE = 6;
+    public const SE_MODEL_SIDT = 7;
+    public const SEMOD_NPREC = 11;
+    public const SEMOD_PREC_IAU_1976 = 1;
+    public const SEMOD_PREC_LASKAR_1986 = 2;
+    public const SEMOD_PREC_WILL_EPS_LASK = 3;
+    public const SEMOD_PREC_WILLIAMS_1994 = 4;
+    public const SEMOD_PREC_SIMON_1994 = 5;
+    public const SEMOD_PREC_IAU_2000 = 6;
+    public const SEMOD_PREC_BRETAGNON_2003 = 7;
+    public const SEMOD_PREC_IAU_2006 = 8;
+    public const SEMOD_PREC_VONDRAK_2011 = 9;
+    public const SEMOD_PREC_OWEN_1990 = 10;
+    public const SEMOD_PREC_NEWCOMB = 11;
+    public const SEMOD_PREC_DEFAULT = self::SEMOD_PREC_VONDRAK_2011;
+    public const SEMOD_PREC_DEFAULT_SHORT = self::SEMOD_PREC_VONDRAK_2011;
+    public const SEMOD_NNUT = 5;
+    public const SEMOD_NUT_IAU_1980 = 1;
+    public const SEMOD_NUT_IAU_CORR_1987 = 2;
+    public const SEMOD_NUT_IAU_2000A = 3;
+    public const SEMOD_NUT_IAU_2000B = 4;
+    public const SEMOD_NUT_WOOLARD = 5;
+    public const SEMOD_NUT_DEFAULT = self::SEMOD_NUT_IAU_2000B;
+    public const SEMOD_NSIDT = 4;
+    public const SEMOD_SIDT_IAU_1976 = 1;
+    public const SEMOD_SIDT_IAU_2006 = 2;
+    public const SEMOD_SIDT_IERS_CONV_2010 = 3;
+    public const SEMOD_SIDT_LONGTERM = 4;
+    public const SEMOD_SIDT_DEFAULT = self::SEMOD_SIDT_LONGTERM;
+    public const SEMOD_NBIAS = 3;
+    public const SEMOD_BIAS_NONE = 1;
+    public const SEMOD_BIAS_IAU2000 = 2;
+    public const SEMOD_BIAS_IAU2006 = 3;
+    public const SEMOD_BIAS_DEFAULT = self::SEMOD_BIAS_IAU2006;
+    public const SEMOD_NJPLHOR = 2;
+    public const SEMOD_JPLHOR_LONG_AGREEMENT = 1;
+    public const SEMOD_JPLHOR_DEFAULT = self::SEMOD_JPLHOR_LONG_AGREEMENT;
+    public const SEMOD_NJPLHORA = 3;
+    public const SEMOD_JPLHORA_1 = 1;
+    public const SEMOD_JPLHORA_2 = 2;
+    public const SEMOD_JPLHORA_3 = 3;
+    public const SEMOD_JPLHORA_DEFAULT = self::SEMOD_JPLHORA_3;
+    public const SEMOD_NDELTAT = 5;
+    public const SEMOD_DELTAT_STEPHENSON_MORRISON_1984 = 1;
+    public const SEMOD_DELTAT_STEPHENSON_1997 = 2;
+    public const SEMOD_DELTAT_STEPHENSON_MORRISON_2004 = 3;
+    public const SEMOD_DELTAT_ESPENAK_MEEUS_2006 = 4;
+    public const SEMOD_DELTAT_STEPHENSON_ETC_2016 = 5;
+    public const SEMOD_DELTAT_DEFAULT = self::SEMOD_DELTAT_STEPHENSON_ETC_2016;
     public const SE_HOUSES_PLACIDUS = 'P';
     public const SE_HOUSES_KOCH = 'K';
     public const SE_HOUSES_PORPHYRIUS = 'O';
@@ -81,11 +366,10 @@ class SwissEphFFI
     public const SE_HOUSES_ALCABITUS = 'B';
     public const SE_HOUSES_MORINUS = 'M';
     public const SE_HOUSES_KRUSINSKI = 'U';
-    
-    // Error codes
     public const OK = 0;
     public const ERR = -1;
-    
+
+    // ======== CONSTRUCTOR ========
     public function __construct(?string $libraryPath = null)
     {
         if (self::$ffi !== null) return;
@@ -131,708 +415,662 @@ class SwissEphFFI
         return __DIR__ . '/../../build/libswe.so';
     }
     
+    // ======== C DEFINITIONS ========
     private function getCDefinitions(): string
     {
         return <<<'CDEF'
         typedef double dbl;
-        typedef long int32;
+        typedef int int32;
         
         #define PASCAL_CONV
         #define EXP16
-        
-        // Initialization
-        void PASCAL_CONV swe_set_epath(char *path);
-        char* PASCAL_CONV swe_get_epath(void);
-        void PASCAL_CONV swe_set_jpl_file(char *fname);
-        void PASCAL_CONV swe_close(void);
-        char* PASCAL_CONV swe_version(char *vers);
-        void PASCAL_CONV swe_set_debug_level(int32 level);
-        int32 PASCAL_CONV swe_get_debug_level(void);
-        
-        // Planet calculations
-        int PASCAL_CONV swe_calc_ut(dbl tjd_ut, int32 ipl, int32 iflag, dbl *xx, char *serr);
-        int PASCAL_CONV swe_calc(dbl tjd, int32 ipl, int32 iflag, dbl *xx, char *serr);
-        int PASCAL_CONV swe_calc_ut_speed(dbl tjd_ut, int32 ipl, int32 iflag, dbl *xx, char *serr);
-        int PASCAL_CONV swe_calc_speed(dbl tjd, int32 ipl, int32 iflag, dbl *xx, char *serr);
-        
-        // Fixstars
-        int PASCAL_CONV swe_fixstar_ut(char *star, dbl tjd_ut, int32 iflag, dbl *xx, char *serr);
-        int PASCAL_CONV swe_fixstar(char *star, dbl tjd, int32 iflag, dbl *xx, char *serr);
-        int PASCAL_CONV swe_fixstar_ut_mag(char *star, dbl tjd_ut, int32 iflag, dbl *xx, dbl *mag, char *serr);
-        int PASCAL_CONV swe_fixstar_mag(char *star, dbl tjd, int32 iflag, dbl *xx, dbl *mag, char *serr);
-        
-        // House calculations
-        int PASCAL_CONV swe_houses(dbl tjd_ut, dbl geolat, dbl geolon, int32 hsys, dbl *cusps, dbl *ascmc);
-        int PASCAL_CONV swe_houses_ut(dbl tjd_ut, dbl geolat, dbl geolon, int32 hsys, dbl *cusps, dbl *ascmc);
-        int PASCAL_CONV swe_houses_armc(dbl armc, dbl geolat, dbl eps, int32 hsys, dbl *cusps, dbl *ascmc);
-        int PASCAL_CONV swe_houses_ex(dbl tjd_ut, int32 iflag, dbl geolat, dbl geolon, int32 hsys, dbl *cusps, dbl *ascmc);
-        int PASCAL_CONV swe_house_pos(dbl armc, dbl geolat, dbl eps, int32 hsys, dbl *xpin, char *serr);
-        
-        // Time calculations
-        dbl PASCAL_CONV swe_julday(int32 year, int32 month, int32 day, dbl hour, int32 gregflag);
-        void PASCAL_CONV swe_revjul(dbl tjd, int32 gregflag, int32 *iyear, int32 *imonth, int32 *iday, dbl *hour);
-        dbl PASCAL_CONV swe_deltat(dbl tjd);
-        dbl PASCAL_CONV swe_deltat_ex(dbl tjd, int32 ephe_flag, char *serr);
-        void PASCAL_CONV swe_utc_time_zone(int32 *iyear, int32 *imonth, int32 *iday, dbl *hour, int32 *minute, int32 *second, int32 *timezone);
-        void PASCAL_CONV swe_utc_to_zone(int32 *iyear, int32 *imonth, int32 *iday, dbl *hour, int32 *minute, int32 *second, int32 *timezone);
-        int PASCAL_CONV swe_utc_to_jd(int32 *iyear, int32 *imonth, int32 *iday, dbl *hour, int32 *minute, dbl *second, int32 *timezone, dbl *tjd, char *serr);
-        void PASCAL_CONV swe_jd_to_utc(dbl tjd, int32 *iyear, int32 *imonth, int32 *iday, dbl *hour, int32 *minute, dbl *second);
-        
-        // Sidereal mode
-        void PASCAL_CONV swe_set_sid_mode(int32 sid_mode);
-        void PASCAL_CONV swe_set_sid_mode_with_precession(int32 sid_mode, dbl t0, dbl ayan_t0);
-        dbl PASCAL_CONV swe_get_ayanamsa(dbl tjd);
-        dbl PASCAL_CONV swe_get_ayanamsa_ut(dbl tjd_ut);
-        char* PASCAL_CONV swe_get_ayanamsa_name(int32 isidmode);
-        
-        // Eclipse calculations
-        int PASCAL_CONV swe_sol_eclipse_when_loc(dbl tjd_start, int32 ifl, dbl *geopos, dbl *tret, dbl *attr, char *serr);
-        int PASCAL_CONV swe_lun_eclipse_when_loc(dbl tjd_start, int32 ifl, dbl *geopos, dbl *tret, dbl *attr, char *serr);
-        int PASCAL_CONV swe_sol_eclipse_when_glob(dbl tjd_start, int32 ifl, int32 ifltype, dbl *tret, dbl *attr, char *serr);
-        int PASCAL_CONV swe_lun_eclipse_when(dbl tjd_start, int32 ifl, int32 ifltype, dbl *tret, dbl *attr, char *serr);
-        int PASCAL_CONV swe_sol_eclipse_how(dbl tjd_ut, int32 ifl, dbl *geopos, dbl *attr, char *serr);
-        int PASCAL_CONV swe_lun_eclipse_how(dbl tjd_ut, int32 ifl, dbl *geopos, dbl *attr, char *serr);
-        int PASCAL_CONV swe_sol_eclipse_when_loc_tjd_start(dbl tjd_start, int32 ifl, dbl *geopos, dbl *tret, dbl *attr, char *serr);
-        
-        // Planetary phenomena
-        int PASCAL_CONV swe_pheno(dbl tjd_ut, int32 ipl, int32 iflag, dbl *attr, char *serr);
-        int PASCAL_CONV swe_pheno_ut(dbl tjd_ut, int32 ipl, int32 iflag, dbl *attr, char *serr);
-        dbl PASCAL_CONV swe_refrac(dbl inalt, dbl atpress, dbl attemp, int32 calc_flag);
-        dbl PASCAL_CONV swe_refrac_extended(dbl inalt, dbl atpress, dbl attemp, int32 calc_flag, dbl horizon_altitude);
-        
-        // Rise and Set times
-        int PASCAL_CONV swe_rise_trans(dbl tjd_ut, int32 ipl, char *starname, int32 epheflag, int32 rsmi, dbl *geopos, dbl atpress, dbl attemp, dbl *tret, char *serr);
-        int PASCAL_CONV swe_rise_trans_tjd_start(dbl tjd_start, int32 ipl, char *starname, int32 epheflag, int32 rsmi, dbl *geopos, dbl atpress, dbl attemp, dbl *tret, char *serr);
-        
-        // Azimuth/Altitude
-        void PASCAL_CONV swe_azalt(dbl tjd_ut, int32 calc_flag, dbl *geopos, dbl atpress, dbl attemp, dbl *xin, dbl *xaz);
-        void PASCAL_CONV swe_azalt_rev(dbl tjd_ut, int32 calc_flag, dbl *geopos, dbl *xin, dbl *xaz);
-        
-        // Node and apsis
-        int PASCAL_CONV swe_nod_aps(dbl tjd_ut, int32 ipl, int32 iflag, int32 icalc, dbl *xnasc, dbl *xndsc, dbl *xperi, dbl *xaphe, char *serr);
-        int PASCAL_CONV swe_nod_aps_ut(dbl tjd_ut, int32 ipl, int32 iflag, int32 icalc, dbl *xnasc, dbl *xndsc, dbl *xperi, dbl *xaphe, char *serr);
-        
-        // Orbital elements
-        int PASCAL_CONV swe_orbel_max(dbl tjd_ut, int32 ipl, char *serr);
-        
-        // Planetary nodes
-        int PASCAL_CONV swe_planet_nodes(dbl tjd_ut, int32 ipl, int32 iflag, dbl *xnode, dbl *xoppos, char *serr);
-        
-        // Time equation
-        dbl PASCAL_CONV swe_time_equ(dbl tjd);
-        
-        // Obliquity
-        dbl PASCAL_CONV swe_get_ecliptic_obliquity(dbl tjd);
-        
-        // Nutation
-        void PASCAL_CONV swe_nutation(dbl tjd, int32 iflag, dbl *nut, dbl *eps);
-        
-        // Planetary names
-        char* PASCAL_CONV swe_get_planet_name(int32 ipl, char *plname);
-        void PASCAL_CONV swe_set_planet_name(int32 ipl, char *plname);
-        
-        // Helper functions
-        void PASCAL_CONV swe_split_deg(dbl ddeg, int32 roundflag, int32 *ideg, int32 *imin, int32 *isec, dbl *dsecfac, int32 *isgn);
-        dbl PASCAL_CONV swe_cotrans(dbl *x, dbl *y, dbl *z, dbl eps);
-        dbl PASCAL_CONV swe_cotrans_sp(dbl *x, dbl *y, dbl *z, dbl eps);
-        
-        // Precession
-        void PASCAL_CONV swe_precess(dbl *x, dbl eps, int32 direction);
-        
-        // Constellation
-        int PASCAL_CONV swe_get_constellation(dbl *x, char *sconst);
-        
-        // Speed calculation
-        int PASCAL_CONV swe_get_speed(dbl tjd_ut, int32 ipl, int32 iflag, dbl *xx, char *serr);
-        
-        // Heliacal events
-        int PASCAL_CONV swe_heliacal_ut(dbl tjd_start, dbl *dobs, dbl *datm, dbl *dobj, char *sobj, int32 type, dbl *dret, char *serr);
-        int PASCAL_CONV swe_vis_limit_mag(dbl tjdut, dbl *dobs, dbl *datm, dbl *dobj, char *sobj, dbl *dret, char *serr);
-        
-        // Database functions
-        int PASCAL_CONV swe_open_jpl_file(char *fname, char *serr);
-        void PASCAL_CONV swe_close_jpl_file(void);
-        int PASCAL_CONV swe_jpl_version(char *vers);
-        
-        // Custom ephemeris
-        void PASCAL_CONV swe_set_custom_ephem(char *path);
-        
-        // Tide calculations
-        int PASCAL_CONV swe_tide_when(dbl tjd_start, dbl *geopos, int32 ifl, int32 tide_type, dbl *tret, char *serr);
-        
-        // Graph functions
-        void PASCAL_CONV swe_graph(dbl *x, int32 n, int32 type, dbl *result);
-        
-        // Extended cartesian
-        int PASCAL_CONV swe_get_extended_cartesian(dbl *x, int32 iflag, dbl *xout);
+
+        int32 swe_heliacal_ut(double tjdstart_ut, double *geopos, double *datm, double *dobs, char *ObjectName, int32 TypeEvent, int32 iflag, double *dret, char *serr);
+        int32 swe_heliacal_pheno_ut(double tjd_ut, double *geopos, double *datm, double *dobs, char *ObjectName, int32 TypeEvent, int32 helflag, double *darr, char *serr);
+        int32 swe_vis_limit_mag(double tjdut, double *geopos, double *datm, double *dobs, char *ObjectName, int32 helflag, double *dret, char *serr);
+        int32 swe_heliacal_angle(double tjdut, double *dgeo, double *datm, double *dobs, int32 helflag, double mag, double azi_obj, double azi_sun, double azi_moon, double alt_moon, double *dret, char *serr);
+        int32 swe_topo_arcus_visionis(double tjdut, double *dgeo, double *datm, double *dobs, int32 helflag, double mag, double azi_obj, double alt_obj, double azi_sun, double azi_moon, double alt_moon, double *dret, char *serr);
+        void swe_set_astro_models(char *samod, int32 iflag);
+        void swe_get_astro_models(char *samod, char *sdet, int32 iflag);
+        char * swe_version(char *p);
+        char * swe_get_library_path(char *p);
+        int32 swe_calc(double tjd, int ipl, int32 iflag, double *xx, char *serr);
+        int32 swe_calc_ut(double tjd_ut, int32 ipl, int32 iflag, double *xx, char *serr);
+        int32 swe_calc_pctr(double tjd, int32 ipl, int32 iplctr, int32 iflag, double *xxret, char *serr);
+        double swe_solcross(double x2cross, double jd_et, int32 flag, char *serr);
+        double swe_solcross_ut(double x2cross, double jd_ut, int32 flag, char *serr);
+        double swe_mooncross(double x2cross, double jd_et, int32 flag, char *serr);
+        double swe_mooncross_ut(double x2cross, double jd_ut, int32 flag, char *serr);
+        double swe_mooncross_node(double jd_et, int32 flag, double *xlon, double *xlat, char *serr);
+        double swe_mooncross_node_ut(double jd_ut, int32 flag, double *xlon, double *xlat, char *serr);
+        int32 swe_helio_cross(int32 ipl, double x2cross, double jd_et, int32 iflag, int32 dir, double *jd_cross, char *serr);
+        int32 swe_helio_cross_ut(int32 ipl, double x2cross, double jd_ut, int32 iflag, int32 dir, double *jd_cross, char *serr);
+        int32 swe_fixstar(char *star, double tjd, int32 iflag, double *xx, char *serr);
+        int32 swe_fixstar_ut(char *star, double tjd_ut, int32 iflag, double *xx, char *serr);
+        int32 swe_fixstar_mag(char *star, double *mag, char *serr);
+        int32 swe_fixstar2(char *star, double tjd, int32 iflag, double *xx, char *serr);
+        int32 swe_fixstar2_ut(char *star, double tjd_ut, int32 iflag, double *xx, char *serr);
+        int32 swe_fixstar2_mag(char *star, double *mag, char *serr);
+        void swe_close(void);
+        void swe_set_ephe_path(char *path);
+        void swe_set_jpl_file(char *fname);
+        char * swe_get_planet_name(int ipl, char *spname);
+        void swe_set_topo(double geolon, double geolat, double geoalt);
+        void swe_set_sid_mode(int32 sid_mode, double t0, double ayan_t0);
+        int32 swe_get_ayanamsa_ex(double tjd_et, int32 iflag, double *daya, char *serr);
+        int32 swe_get_ayanamsa_ex_ut(double tjd_ut, int32 iflag, double *daya, char *serr);
+        double swe_get_ayanamsa(double tjd_et);
+        double swe_get_ayanamsa_ut(double tjd_ut);
+        char * swe_get_ayanamsa_name(int32 isidmode);
+        char * swe_get_current_file_data(int ifno, double *tfstart, double *tfend, int *denum);
+        int swe_date_conversion(int y, int m, int d, double utime, char c, double *tjd);
+        double swe_julday(int year, int month, int day, double hour, int gregflag);
+        void swe_revjul(double jd, int gregflag, int *jyear, int *jmon, int *jday, double *jut);
+        int32 swe_utc_to_jd(int32 iyear, int32 imonth, int32 iday, int32 ihour, int32 imin, double dsec, int32 gregflag, double *dret, char *serr);
+        void swe_jdet_to_utc(double tjd_et, int32 gregflag, int32 *iyear, int32 *imonth, int32 *iday, int32 *ihour, int32 *imin, double *dsec);
+        void swe_jdut1_to_utc(double tjd_ut, int32 gregflag, int32 *iyear, int32 *imonth, int32 *iday, int32 *ihour, int32 *imin, double *dsec);
+        void swe_utc_time_zone(int32 iyear, int32 imonth, int32 iday, int32 ihour, int32 imin, double dsec, double d_timezone, int32 *iyear_out, int32 *imonth_out, int32 *iday_out, int32 *ihour_out, int32 *imin_out, double *dsec_out);
+        int swe_houses(double tjd_ut, double geolat, double geolon, int hsys, double *cusps, double *ascmc);
+        int swe_houses_ex(double tjd_ut, int32 iflag, double geolat, double geolon, int hsys, double *cusps, double *ascmc);
+        int swe_houses_ex2(double tjd_ut, int32 iflag, double geolat, double geolon, int hsys, double *cusps, double *ascmc, double *cusp_speed, double *ascmc_speed, char *serr);
+        int swe_houses_armc(double armc, double geolat, double eps, int hsys, double *cusps, double *ascmc);
+        int swe_houses_armc_ex2(double armc, double geolat, double eps, int hsys, double *cusps, double *ascmc, double *cusp_speed, double *ascmc_speed, char *serr);
+        double swe_house_pos(double armc, double geolat, double eps, int hsys, double *xpin, char *serr);
+        char * swe_house_name(int hsys);
+        int32 swe_gauquelin_sector(double t_ut, int32 ipl, char *starname, int32 iflag, int32 imeth, double *geopos, double atpress, double attemp, double *dgsect, char *serr);
+        int32 swe_sol_eclipse_where(double tjd, int32 ifl, double *geopos, double *attr, char *serr);
+        int32 swe_lun_occult_where(double tjd, int32 ipl, char *starname, int32 ifl, double *geopos, double *attr, char *serr);
+        int32 swe_sol_eclipse_how(double tjd, int32 ifl, double *geopos, double *attr, char *serr);
+        int32 swe_sol_eclipse_when_loc(double tjd_start, int32 ifl, double *geopos, double *tret, double *attr, int32 backward, char *serr);
+        int32 swe_lun_occult_when_loc(double tjd_start, int32 ipl, char *starname, int32 ifl, double *geopos, double *tret, double *attr, int32 backward, char *serr);
+        int32 swe_sol_eclipse_when_glob(double tjd_start, int32 ifl, int32 ifltype, double *tret, int32 backward, char *serr);
+        int32 swe_lun_occult_when_glob(double tjd_start, int32 ipl, char *starname, int32 ifl, int32 ifltype, double *tret, int32 backward, char *serr);
+        int32 swe_lun_eclipse_how(double tjd_ut, int32 ifl, double *geopos, double *attr, char *serr);
+        int32 swe_lun_eclipse_when(double tjd_start, int32 ifl, int32 ifltype, double *tret, int32 backward, char *serr);
+        int32 swe_lun_eclipse_when_loc(double tjd_start, int32 ifl, double *geopos, double *tret, double *attr, int32 backward, char *serr);
+        int32 swe_pheno(double tjd, int32 ipl, int32 iflag, double *attr, char *serr);
+        int32 swe_pheno_ut(double tjd_ut, int32 ipl, int32 iflag, double *attr, char *serr);
+        double swe_refrac(double inalt, double atpress, double attemp, int32 calc_flag);
+        double swe_refrac_extended(double inalt, double geoalt, double atpress, double attemp, double lapse_rate, int32 calc_flag, double *dret);
+        void swe_set_lapse_rate(double lapse_rate);
+        void swe_azalt(double tjd_ut, int32 calc_flag, double *geopos, double atpress, double attemp, double *xin, double *xaz);
+        void swe_azalt_rev(double tjd_ut, int32 calc_flag, double *geopos, double *xin, double *xout);
+        int32 swe_rise_trans_true_hor(double tjd_ut, int32 ipl, char *starname, int32 epheflag, int32 rsmi, double *geopos, double atpress, double attemp, double horhgt, double *tret, char *serr);
+        int32 swe_rise_trans(double tjd_ut, int32 ipl, char *starname, int32 epheflag, int32 rsmi, double *geopos, double atpress, double attemp, double *tret, char *serr);
+        int32 swe_nod_aps(double tjd_et, int32 ipl, int32 iflag, int32 method, double *xnasc, double *xndsc, double *xperi, double *xaphe, char *serr);
+        int32 swe_nod_aps_ut(double tjd_ut, int32 ipl, int32 iflag, int32 method, double *xnasc, double *xndsc, double *xperi, double *xaphe, char *serr);
+        int32 swe_get_orbital_elements(double tjd_et, int32 ipl, int32 iflag, double *dret, char *serr);
+        int32 swe_orbit_max_min_true_distance(double tjd_et, int32 ipl, int32 iflag, double *dmax, double *dmin, double *dtrue, char *serr);
+        double swe_deltat(double tjd);
+        double swe_deltat_ex(double tjd, int32 iflag, char *serr);
+        int32 swe_time_equ(double tjd, double *te, char *serr);
+        int32 swe_lmt_to_lat(double tjd_lmt, double geolon, double *tjd_lat, char *serr);
+        int32 swe_lat_to_lmt(double tjd_lat, double geolon, double *tjd_lmt, char *serr);
+        double swe_sidtime0(double tjd_ut, double eps, double nut);
+        double swe_sidtime(double tjd_ut);
+        void swe_set_interpolate_nut(int32 do_interpolate);
+        void swe_cotrans(double *xpo, double *xpn, double eps);
+        void swe_cotrans_sp(double *xpo, double *xpn, double eps);
+        double swe_get_tid_acc(void);
+        void swe_set_tid_acc(double t_acc);
+        void swe_set_delta_t_userdef(double dt);
+        double swe_degnorm(double x);
+        double swe_radnorm(double x);
+        double swe_rad_midp(double x1, double x0);
+        double swe_deg_midp(double x1, double x0);
+        void swe_split_deg(double ddeg, int32 roundflag, int32 *ideg, int32 *imin, int32 *isec, double *dsecfr, int32 *isgn);
+        int32 swe_csnorm(int32 p);
+        int32 swe_difcsn(int32 p1, int32 p2);
+        double swe_difdegn(double p1, double p2);
+        int32 swe_difcs2n(int32 p1, int32 p2);
+        double swe_difdeg2n(double p1, double p2);
+        double swe_difrad2n(double p1, double p2);
+        int32 swe_csroundsec(int32 x);
+        int32 swe_d2l(double x);
+        int swe_day_of_week(double jd);
+        char * swe_cs2timestr(int32 t, int sep, int32 suppressZero, char *a);
+        char * swe_cs2lonlatstr(int32 t, char pchar, char mchar, char *s);
+        char * swe_cs2degstr(int32 t, char *a);
         CDEF;
     }
-    
-    // ========== INITIALIZATION FUNCTIONS ==========
-    
-    public function swe_set_epath(string $path): void
+
+    // ======== METHODS ========
+    public function swe_heliacal_ut(float $tjdstart_ut, mixed $geopos, mixed $datm, mixed $dobs, string|\FFI\CData $ObjectName, int $TypeEvent, int $iflag, mixed $dret, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $cPath = $ffi->new("char[512]");
-        FFI::memcpy($cPath, $path, strlen($path) + 1);
-        $ffi->swe_set_epath($cPath);
+        return $this->getFFI()->swe_heliacal_ut($tjdstart_ut, $geopos, $datm, $dobs, $ObjectName, $TypeEvent, $iflag, $dret, $serr);
     }
-    
-    public function swe_get_epath(): string
+
+    public function swe_heliacal_pheno_ut(float $tjd_ut, mixed $geopos, mixed $datm, mixed $dobs, string|\FFI\CData $ObjectName, int $TypeEvent, int $helflag, mixed $darr, string|\FFI\CData $serr): int
     {
-        $ptr = $this->getFFI()->swe_get_epath();
-        return $ptr ? FFI::string($ptr) : '';
+        return $this->getFFI()->swe_heliacal_pheno_ut($tjd_ut, $geopos, $datm, $dobs, $ObjectName, $TypeEvent, $helflag, $darr, $serr);
     }
-    
-    public function swe_set_jpl_file(string $fname): void
+
+    public function swe_vis_limit_mag(float $tjdut, mixed $geopos, mixed $datm, mixed $dobs, string|\FFI\CData $ObjectName, int $helflag, mixed $dret, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $cFname = $ffi->new("char[256]");
-        FFI::memcpy($cFname, $fname, strlen($fname) + 1);
-        $ffi->swe_set_jpl_file($cFname);
+        return $this->getFFI()->swe_vis_limit_mag($tjdut, $geopos, $datm, $dobs, $ObjectName, $helflag, $dret, $serr);
     }
-    
+
+    public function swe_heliacal_angle(float $tjdut, mixed $dgeo, mixed $datm, mixed $dobs, int $helflag, float $mag, float $azi_obj, float $azi_sun, float $azi_moon, float $alt_moon, mixed $dret, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_heliacal_angle($tjdut, $dgeo, $datm, $dobs, $helflag, $mag, $azi_obj, $azi_sun, $azi_moon, $alt_moon, $dret, $serr);
+    }
+
+    public function swe_topo_arcus_visionis(float $tjdut, mixed $dgeo, mixed $datm, mixed $dobs, int $helflag, float $mag, float $azi_obj, float $alt_obj, float $azi_sun, float $azi_moon, float $alt_moon, mixed $dret, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_topo_arcus_visionis($tjdut, $dgeo, $datm, $dobs, $helflag, $mag, $azi_obj, $alt_obj, $azi_sun, $azi_moon, $alt_moon, $dret, $serr);
+    }
+
+    public function swe_set_astro_models(string|\FFI\CData $samod, int $iflag): void
+    {
+        $this->getFFI()->swe_set_astro_models($samod, $iflag);
+    }
+
+    public function swe_get_astro_models(string|\FFI\CData $samod, string|\FFI\CData $sdet, int $iflag): void
+    {
+        $this->getFFI()->swe_get_astro_models($samod, $sdet, $iflag);
+    }
+
+    public function swe_version(string|\FFI\CData $p): ?string
+    {
+        $ptr = $this->getFFI()->swe_version($p);
+        return $ptr !== null ? \FFI::string($ptr) : null;
+    }
+
+    public function swe_get_library_path(string|\FFI\CData $p): ?string
+    {
+        $ptr = $this->getFFI()->swe_get_library_path($p);
+        return $ptr !== null ? \FFI::string($ptr) : null;
+    }
+
+    public function swe_calc(float $tjd, int $ipl, int $iflag, mixed $xx, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_calc($tjd, $ipl, $iflag, $xx, $serr);
+    }
+
+    public function swe_calc_ut(float $tjd_ut, int $ipl, int $iflag, mixed $xx, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_calc_ut($tjd_ut, $ipl, $iflag, $xx, $serr);
+    }
+
+    public function swe_calc_pctr(float $tjd, int $ipl, int $iplctr, int $iflag, mixed $xxret, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_calc_pctr($tjd, $ipl, $iplctr, $iflag, $xxret, $serr);
+    }
+
+    public function swe_solcross(float $x2cross, float $jd_et, int $flag, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_solcross($x2cross, $jd_et, $flag, $serr);
+    }
+
+    public function swe_solcross_ut(float $x2cross, float $jd_ut, int $flag, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_solcross_ut($x2cross, $jd_ut, $flag, $serr);
+    }
+
+    public function swe_mooncross(float $x2cross, float $jd_et, int $flag, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_mooncross($x2cross, $jd_et, $flag, $serr);
+    }
+
+    public function swe_mooncross_ut(float $x2cross, float $jd_ut, int $flag, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_mooncross_ut($x2cross, $jd_ut, $flag, $serr);
+    }
+
+    public function swe_mooncross_node(float $jd_et, int $flag, mixed $xlon, mixed $xlat, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_mooncross_node($jd_et, $flag, $xlon, $xlat, $serr);
+    }
+
+    public function swe_mooncross_node_ut(float $jd_ut, int $flag, mixed $xlon, mixed $xlat, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_mooncross_node_ut($jd_ut, $flag, $xlon, $xlat, $serr);
+    }
+
+    public function swe_helio_cross(int $ipl, float $x2cross, float $jd_et, int $iflag, int $dir, mixed $jd_cross, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_helio_cross($ipl, $x2cross, $jd_et, $iflag, $dir, $jd_cross, $serr);
+    }
+
+    public function swe_helio_cross_ut(int $ipl, float $x2cross, float $jd_ut, int $iflag, int $dir, mixed $jd_cross, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_helio_cross_ut($ipl, $x2cross, $jd_ut, $iflag, $dir, $jd_cross, $serr);
+    }
+
+    public function swe_fixstar(string|\FFI\CData $star, float $tjd, int $iflag, mixed $xx, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_fixstar($star, $tjd, $iflag, $xx, $serr);
+    }
+
+    public function swe_fixstar_ut(string|\FFI\CData $star, float $tjd_ut, int $iflag, mixed $xx, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_fixstar_ut($star, $tjd_ut, $iflag, $xx, $serr);
+    }
+
+    public function swe_fixstar_mag(string|\FFI\CData $star, mixed $mag, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_fixstar_mag($star, $mag, $serr);
+    }
+
+    public function swe_fixstar2(string|\FFI\CData $star, float $tjd, int $iflag, mixed $xx, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_fixstar2($star, $tjd, $iflag, $xx, $serr);
+    }
+
+    public function swe_fixstar2_ut(string|\FFI\CData $star, float $tjd_ut, int $iflag, mixed $xx, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_fixstar2_ut($star, $tjd_ut, $iflag, $xx, $serr);
+    }
+
+    public function swe_fixstar2_mag(string|\FFI\CData $star, mixed $mag, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_fixstar2_mag($star, $mag, $serr);
+    }
+
     public function swe_close(): void
     {
         $this->getFFI()->swe_close();
     }
-    
-    public function swe_version(): string
+
+    public function swe_set_ephe_path(string|\FFI\CData $path): void
     {
-        $ffi = $this->getFFI();
-        $vers = $ffi->new("char[256]");
-        $ffi->swe_version($vers);
-        return FFI::string($vers);
+        $this->getFFI()->swe_set_ephe_path($path);
     }
-    
-    public function swe_set_debug_level(int $level): void
+
+    public function swe_set_jpl_file(string|\FFI\CData $fname): void
     {
-        $this->getFFI()->swe_set_debug_level($level);
+        $this->getFFI()->swe_set_jpl_file($fname);
     }
-    
-    public function swe_get_debug_level(): int
+
+    public function swe_get_planet_name(int $ipl, string|\FFI\CData $spname): ?string
     {
-        return $this->getFFI()->swe_get_debug_level();
+        $ptr = $this->getFFI()->swe_get_planet_name($ipl, $spname);
+        return $ptr !== null ? \FFI::string($ptr) : null;
     }
-    
-    // ========== PLANET CALCULATIONS ==========
-    
-    public function swe_calc_ut(float $tjd_ut, int $planet, int $flags = 0, ?string &$error = null): array|false
+
+    public function swe_set_topo(float $geolon, float $geolat, float $geoalt): void
     {
-        $ffi = $this->getFFI();
-        $xx = $ffi->new("double[6]");
-        $serr = $ffi->new("char[256]");
-        
-        $result = $ffi->swe_calc_ut($tjd_ut, $planet, $flags, $xx, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'longitude' => $xx[0],
-            'latitude' => $xx[1],
-            'distance' => $xx[2],
-            'longitude_speed' => $xx[3],
-            'latitude_speed' => $xx[4],
-            'distance_speed' => $xx[5],
-        ];
+        $this->getFFI()->swe_set_topo($geolon, $geolat, $geoalt);
     }
-    
-    public function swe_calc(float $tjd, int $planet, int $flags = 0, ?string &$error = null): array|false
+
+    public function swe_set_sid_mode(int $sid_mode, float $t0, float $ayan_t0): void
     {
-        $ffi = $this->getFFI();
-        $xx = $ffi->new("double[6]");
-        $serr = $ffi->new("char[256]");
-        
-        $result = $ffi->swe_calc($tjd, $planet, $flags, $xx, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'longitude' => $xx[0],
-            'latitude' => $xx[1],
-            'distance' => $xx[2],
-            'longitude_speed' => $xx[3],
-            'latitude_speed' => $xx[4],
-            'distance_speed' => $xx[5],
-        ];
+        $this->getFFI()->swe_set_sid_mode($sid_mode, $t0, $ayan_t0);
     }
-    
-    // ========== FIXSTARS ==========
-    
-    public function swe_fixstar_ut(string $star, float $tjd_ut, int $flags = 0, ?string &$error = null): array|false
+
+    public function swe_get_ayanamsa_ex(float $tjd_et, int $iflag, mixed $daya, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $xx = $ffi->new("double[6]");
-        $serr = $ffi->new("char[256]");
-        $cStar = $ffi->new("char[256]");
-        FFI::memcpy($cStar, $star, strlen($star) + 1);
-        
-        $result = $ffi->swe_fixstar_ut($cStar, $tjd_ut, $flags, $xx, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'longitude' => $xx[0],
-            'latitude' => $xx[1],
-            'distance' => $xx[2],
-            'longitude_speed' => $xx[3],
-            'latitude_speed' => $xx[4],
-            'distance_speed' => $xx[5],
-        ];
+        return $this->getFFI()->swe_get_ayanamsa_ex($tjd_et, $iflag, $daya, $serr);
     }
-    
-    public function swe_fixstar(string $star, float $tjd, int $flags = 0, ?string &$error = null): array|false
+
+    public function swe_get_ayanamsa_ex_ut(float $tjd_ut, int $iflag, mixed $daya, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $xx = $ffi->new("double[6]");
-        $serr = $ffi->new("char[256]");
-        $cStar = $ffi->new("char[256]");
-        FFI::memcpy($cStar, $star, strlen($star) + 1);
-        
-        $result = $ffi->swe_fixstar($cStar, $tjd, $flags, $xx, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'longitude' => $xx[0],
-            'latitude' => $xx[1],
-            'distance' => $xx[2],
-            'longitude_speed' => $xx[3],
-            'latitude_speed' => $xx[4],
-            'distance_speed' => $xx[5],
-        ];
+        return $this->getFFI()->swe_get_ayanamsa_ex_ut($tjd_ut, $iflag, $daya, $serr);
     }
-    
-    // ========== HOUSE CALCULATIONS ==========
-    
-    public function swe_houses(float $tjd_ut, float $geolat, float $geolon, string $hsys = 'P', ?string &$error = null): array|false
+
+    public function swe_get_ayanamsa(float $tjd_et): float
     {
-        $ffi = $this->getFFI();
-        $cusps = $ffi->new("double[13]");
-        $ascmc = $ffi->new("double[10]");
-        
-        $result = $ffi->swe_houses($tjd_ut, $geolat, $geolon, ord($hsys), $cusps, $ascmc);
-        
-        if ($result === self::ERR) {
-            $error = "House calculation failed";
-            return false;
-        }
-        
-        $houseCusps = [];
-        for ($i = 0; $i < 12; $i++) {
-            $houseCusps[$i + 1] = $cusps[$i];
-        }
-        
-        return [
-            'cusps' => $houseCusps,
-            'ascendant' => $ascmc[0],
-            'mc' => $ascmc[1],
-            'armc' => $ascmc[2],
-            'vertex' => $ascmc[3],
-            'equatorial_ascendant' => $ascmc[4],
-        ];
+        return $this->getFFI()->swe_get_ayanamsa($tjd_et);
     }
-    
-    public function swe_houses_armc(float $armc, float $geolat, float $eps, string $hsys = 'P', ?string &$error = null): array|false
-    {
-        $ffi = $this->getFFI();
-        $cusps = $ffi->new("double[13]");
-        $ascmc = $ffi->new("double[10]");
-        
-        $result = $ffi->swe_houses_armc($armc, $geolat, $eps, ord($hsys), $cusps, $ascmc);
-        
-        if ($result === self::ERR) {
-            $error = "House calculation (ARMC) failed";
-            return false;
-        }
-        
-        $houseCusps = [];
-        for ($i = 0; $i < 12; $i++) {
-            $houseCusps[$i + 1] = $cusps[$i];
-        }
-        
-        return [
-            'cusps' => $houseCusps,
-            'ascendant' => $ascmc[0],
-            'mc' => $ascmc[1],
-            'armc' => $ascmc[2],
-            'vertex' => $ascmc[3],
-            'equatorial_ascendant' => $ascmc[4],
-        ];
-    }
-    
-    public function swe_house_pos(float $armc, float $geolat, float $eps, string $hsys, array $xpin, ?string &$error = null): array|false
-    {
-        $ffi = $this->getFFI();
-        $cXpin = $ffi->new("double[3]");
-        $serr = $ffi->new("char[256]");
-        
-        $cXpin[0] = $xpin[0];
-        $cXpin[1] = $xpin[1];
-        $cXpin[2] = $xpin[2];
-        
-        $result = $ffi->swe_house_pos($armc, $geolat, $eps, ord($hsys), $cXpin, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return ['house_position' => $result];
-    }
-    
-    // ========== TIME CALCULATIONS ==========
-    
-    public function swe_julday(int $year, int $month, int $day, float $hour, int $gregflag = 1): float
-    {
-        return $this->getFFI()->swe_julday($year, $month, $day, $hour, $gregflag);
-    }
-    
-    public function swe_revjul(float $tjd, int $gregflag = 1): array
-    {
-        $ffi = $this->getFFI();
-        $year = $ffi->new("int32");
-        $month = $ffi->new("int32");
-        $day = $ffi->new("int32");
-        $hour = $ffi->new("double");
-        
-        $ffi->swe_revjul($tjd, $gregflag, $year, $month, $day, $hour);
-        
-        return [
-            'year' => $year->cdata,
-            'month' => $month->cdata,
-            'day' => $day->cdata,
-            'hour' => $hour->cdata,
-        ];
-    }
-    
-    public function swe_deltat(float $tjd): float
-    {
-        return $this->getFFI()->swe_deltat($tjd);
-    }
-    
-    public function swe_deltat_ex(float $tjd, int $ephe_flag, ?string &$error = null): float
-    {
-        $ffi = $this->getFFI();
-        $serr = $ffi->new("char[256]");
-        $result = $ffi->swe_deltat_ex($tjd, $ephe_flag, $serr);
-        $error = FFI::string($serr);
-        return $result;
-    }
-    
-    // ========== SIDEREAL MODE ==========
-    
-    public function swe_set_sid_mode(int $sid_mode): void
-    {
-        $this->getFFI()->swe_set_sid_mode($sid_mode);
-    }
-    
-    public function swe_get_ayanamsa(float $tjd): float
-    {
-        return $this->getFFI()->swe_get_ayanamsa($tjd);
-    }
-    
+
     public function swe_get_ayanamsa_ut(float $tjd_ut): float
     {
         return $this->getFFI()->swe_get_ayanamsa_ut($tjd_ut);
     }
-    
-    public function swe_get_ayanamsa_name(int $sid_mode): string
+
+    public function swe_get_ayanamsa_name(int $isidmode): ?string
     {
-        $ptr = $this->getFFI()->swe_get_ayanamsa_name($sid_mode);
-        return $ptr ? FFI::string($ptr) : '';
+        $ptr = $this->getFFI()->swe_get_ayanamsa_name($isidmode);
+        return $ptr !== null ? \FFI::string($ptr) : null;
     }
-    
-    // ========== ECLIPSE CALCULATIONS ==========
-    
-    public function swe_sol_eclipse_when_loc(float $tjd_start, int $ifl, array $geopos, ?string &$error = null): array|false
+
+    public function swe_get_current_file_data(int $ifno, mixed $tfstart, mixed $tfend, mixed $denum): ?string
     {
-        $ffi = $this->getFFI();
-        $tret = $ffi->new("double[5]");
-        $attr = $ffi->new("double[20]");
-        $serr = $ffi->new("char[256]");
-        $cGeopos = $ffi->new("double[3]");
-        
-        $cGeopos[0] = $geopos[0];
-        $cGeopos[1] = $geopos[1];
-        $cGeopos[2] = $geopos[2];
-        
-        $result = $ffi->swe_sol_eclipse_when_loc($tjd_start, $ifl, $cGeopos, $tret, $attr, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'tjd' => [$tret[0], $tret[1], $tret[2], $tret[3], $tret[4]],
-            'attributes' => [$attr[0], $attr[1], $attr[2], $attr[3]],
-        ];
+        $ptr = $this->getFFI()->swe_get_current_file_data($ifno, $tfstart, $tfend, $denum);
+        return $ptr !== null ? \FFI::string($ptr) : null;
     }
-    
-    public function swe_lun_eclipse_when_loc(float $tjd_start, int $ifl, array $geopos, ?string &$error = null): array|false
+
+    public function swe_date_conversion(int $y, int $m, int $d, float $utime, mixed $c, mixed $tjd): int
     {
-        $ffi = $this->getFFI();
-        $tret = $ffi->new("double[5]");
-        $attr = $ffi->new("double[20]");
-        $serr = $ffi->new("char[256]");
-        $cGeopos = $ffi->new("double[3]");
-        
-        $cGeopos[0] = $geopos[0];
-        $cGeopos[1] = $geopos[1];
-        $cGeopos[2] = $geopos[2];
-        
-        $result = $ffi->swe_lun_eclipse_when_loc($tjd_start, $ifl, $cGeopos, $tret, $attr, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'tjd' => [$tret[0], $tret[1], $tret[2], $tret[3], $tret[4]],
-            'attributes' => [$attr[0], $attr[1], $attr[2], $attr[3]],
-        ];
+        return $this->getFFI()->swe_date_conversion($y, $m, $d, $utime, $c, $tjd);
     }
-    
-    public function swe_sol_eclipse_how(float $tjd_ut, int $ifl, array $geopos, ?string &$error = null): array|false
+
+    public function swe_julday(int $year, int $month, int $day, float $hour, int $gregflag): float
     {
-        $ffi = $this->getFFI();
-        $attr = $ffi->new("double[20]");
-        $serr = $ffi->new("char[256]");
-        $cGeopos = $ffi->new("double[3]");
-        
-        $cGeopos[0] = $geopos[0];
-        $cGeopos[1] = $geopos[1];
-        $cGeopos[2] = $geopos[2];
-        
-        $result = $ffi->swe_sol_eclipse_how($tjd_ut, $ifl, $cGeopos, $attr, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return ['attributes' => $attr];
+        return $this->getFFI()->swe_julday($year, $month, $day, $hour, $gregflag);
     }
-    
-    // ========== PLANETARY PHENOMENA ==========
-    
-    public function swe_pheno(float $tjd_ut, int $ipl, int $iflag = 0, ?string &$error = null): array|false
+
+    public function swe_revjul(float $jd, int $gregflag, mixed $jyear, mixed $jmon, mixed $jday, mixed $jut): void
     {
-        $ffi = $this->getFFI();
-        $attr = $ffi->new("double[20]");
-        $serr = $ffi->new("char[256]");
-        
-        $result = $ffi->swe_pheno($tjd_ut, $ipl, $iflag, $attr, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'phase_angle' => $attr[0],
-            'phase' => $attr[1],
-            'elongation' => $attr[2],
-            'apparent_diameter' => $attr[3],
-            'magnitude' => $attr[4],
-        ];
+        $this->getFFI()->swe_revjul($jd, $gregflag, $jyear, $jmon, $jday, $jut);
     }
-    
-    public function swe_refrac(float $inalt, float $atpress = 1013.25, float $attemp = 15.0, int $calc_flag = 0): float
+
+    public function swe_utc_to_jd(int $iyear, int $imonth, int $iday, int $ihour, int $imin, float $dsec, int $gregflag, mixed $dret, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_utc_to_jd($iyear, $imonth, $iday, $ihour, $imin, $dsec, $gregflag, $dret, $serr);
+    }
+
+    public function swe_jdet_to_utc(float $tjd_et, int $gregflag, mixed $iyear, mixed $imonth, mixed $iday, mixed $ihour, mixed $imin, mixed $dsec): void
+    {
+        $this->getFFI()->swe_jdet_to_utc($tjd_et, $gregflag, $iyear, $imonth, $iday, $ihour, $imin, $dsec);
+    }
+
+    public function swe_jdut1_to_utc(float $tjd_ut, int $gregflag, mixed $iyear, mixed $imonth, mixed $iday, mixed $ihour, mixed $imin, mixed $dsec): void
+    {
+        $this->getFFI()->swe_jdut1_to_utc($tjd_ut, $gregflag, $iyear, $imonth, $iday, $ihour, $imin, $dsec);
+    }
+
+    public function swe_utc_time_zone(int $iyear, int $imonth, int $iday, int $ihour, int $imin, float $dsec, float $d_timezone, mixed $iyear_out, mixed $imonth_out, mixed $iday_out, mixed $ihour_out, mixed $imin_out, mixed $dsec_out): void
+    {
+        $this->getFFI()->swe_utc_time_zone($iyear, $imonth, $iday, $ihour, $imin, $dsec, $d_timezone, $iyear_out, $imonth_out, $iday_out, $ihour_out, $imin_out, $dsec_out);
+    }
+
+    public function swe_houses(float $tjd_ut, float $geolat, float $geolon, int $hsys, mixed $cusps, mixed $ascmc): int
+    {
+        return $this->getFFI()->swe_houses($tjd_ut, $geolat, $geolon, $hsys, $cusps, $ascmc);
+    }
+
+    public function swe_houses_ex(float $tjd_ut, int $iflag, float $geolat, float $geolon, int $hsys, mixed $cusps, mixed $ascmc): int
+    {
+        return $this->getFFI()->swe_houses_ex($tjd_ut, $iflag, $geolat, $geolon, $hsys, $cusps, $ascmc);
+    }
+
+    public function swe_houses_ex2(float $tjd_ut, int $iflag, float $geolat, float $geolon, int $hsys, mixed $cusps, mixed $ascmc, mixed $cusp_speed, mixed $ascmc_speed, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_houses_ex2($tjd_ut, $iflag, $geolat, $geolon, $hsys, $cusps, $ascmc, $cusp_speed, $ascmc_speed, $serr);
+    }
+
+    public function swe_houses_armc(float $armc, float $geolat, float $eps, int $hsys, mixed $cusps, mixed $ascmc): int
+    {
+        return $this->getFFI()->swe_houses_armc($armc, $geolat, $eps, $hsys, $cusps, $ascmc);
+    }
+
+    public function swe_houses_armc_ex2(float $armc, float $geolat, float $eps, int $hsys, mixed $cusps, mixed $ascmc, mixed $cusp_speed, mixed $ascmc_speed, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_houses_armc_ex2($armc, $geolat, $eps, $hsys, $cusps, $ascmc, $cusp_speed, $ascmc_speed, $serr);
+    }
+
+    public function swe_house_pos(float $armc, float $geolat, float $eps, int $hsys, mixed $xpin, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_house_pos($armc, $geolat, $eps, $hsys, $xpin, $serr);
+    }
+
+    public function swe_house_name(int $hsys): ?string
+    {
+        $ptr = $this->getFFI()->swe_house_name($hsys);
+        return $ptr !== null ? \FFI::string($ptr) : null;
+    }
+
+    public function swe_gauquelin_sector(float $t_ut, int $ipl, string|\FFI\CData $starname, int $iflag, int $imeth, mixed $geopos, float $atpress, float $attemp, mixed $dgsect, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_gauquelin_sector($t_ut, $ipl, $starname, $iflag, $imeth, $geopos, $atpress, $attemp, $dgsect, $serr);
+    }
+
+    public function swe_sol_eclipse_where(float $tjd, int $ifl, mixed $geopos, mixed $attr, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_sol_eclipse_where($tjd, $ifl, $geopos, $attr, $serr);
+    }
+
+    public function swe_lun_occult_where(float $tjd, int $ipl, string|\FFI\CData $starname, int $ifl, mixed $geopos, mixed $attr, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lun_occult_where($tjd, $ipl, $starname, $ifl, $geopos, $attr, $serr);
+    }
+
+    public function swe_sol_eclipse_how(float $tjd, int $ifl, mixed $geopos, mixed $attr, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_sol_eclipse_how($tjd, $ifl, $geopos, $attr, $serr);
+    }
+
+    public function swe_sol_eclipse_when_loc(float $tjd_start, int $ifl, mixed $geopos, mixed $tret, mixed $attr, int $backward, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_sol_eclipse_when_loc($tjd_start, $ifl, $geopos, $tret, $attr, $backward, $serr);
+    }
+
+    public function swe_lun_occult_when_loc(float $tjd_start, int $ipl, string|\FFI\CData $starname, int $ifl, mixed $geopos, mixed $tret, mixed $attr, int $backward, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lun_occult_when_loc($tjd_start, $ipl, $starname, $ifl, $geopos, $tret, $attr, $backward, $serr);
+    }
+
+    public function swe_sol_eclipse_when_glob(float $tjd_start, int $ifl, int $ifltype, mixed $tret, int $backward, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_sol_eclipse_when_glob($tjd_start, $ifl, $ifltype, $tret, $backward, $serr);
+    }
+
+    public function swe_lun_occult_when_glob(float $tjd_start, int $ipl, string|\FFI\CData $starname, int $ifl, int $ifltype, mixed $tret, int $backward, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lun_occult_when_glob($tjd_start, $ipl, $starname, $ifl, $ifltype, $tret, $backward, $serr);
+    }
+
+    public function swe_lun_eclipse_how(float $tjd_ut, int $ifl, mixed $geopos, mixed $attr, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lun_eclipse_how($tjd_ut, $ifl, $geopos, $attr, $serr);
+    }
+
+    public function swe_lun_eclipse_when(float $tjd_start, int $ifl, int $ifltype, mixed $tret, int $backward, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lun_eclipse_when($tjd_start, $ifl, $ifltype, $tret, $backward, $serr);
+    }
+
+    public function swe_lun_eclipse_when_loc(float $tjd_start, int $ifl, mixed $geopos, mixed $tret, mixed $attr, int $backward, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lun_eclipse_when_loc($tjd_start, $ifl, $geopos, $tret, $attr, $backward, $serr);
+    }
+
+    public function swe_pheno(float $tjd, int $ipl, int $iflag, mixed $attr, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_pheno($tjd, $ipl, $iflag, $attr, $serr);
+    }
+
+    public function swe_pheno_ut(float $tjd_ut, int $ipl, int $iflag, mixed $attr, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_pheno_ut($tjd_ut, $ipl, $iflag, $attr, $serr);
+    }
+
+    public function swe_refrac(float $inalt, float $atpress, float $attemp, int $calc_flag): float
     {
         return $this->getFFI()->swe_refrac($inalt, $atpress, $attemp, $calc_flag);
     }
-    
-    // ========== RISE AND SET TIMES ==========
-    
-    public function swe_rise_trans(float $tjd_ut, int $ipl, string $starname = '', int $rsmi = 0, array $geopos = [0.0, 0.0, 0.0], float $atpress = 1013.25, float $attemp = 15.0, ?string &$error = null): array|false
+
+    public function swe_refrac_extended(float $inalt, float $geoalt, float $atpress, float $attemp, float $lapse_rate, int $calc_flag, mixed $dret): float
     {
-        $ffi = $this->getFFI();
-        $tret = $ffi->new("double");
-        $serr = $ffi->new("char[256]");
-        $cGeopos = $ffi->new("double[3]");
-        $cStarname = $ffi->new("char[256]");
-        
-        $cGeopos[0] = $geopos[0];
-        $cGeopos[1] = $geopos[1];
-        $cGeopos[2] = $geopos[2];
-        FFI::memcpy($cStarname, $starname, strlen($starname) + 1);
-        
-        $result = $ffi->swe_rise_trans($tjd_ut, $ipl, $cStarname, 0, $rsmi, $cGeopos, $atpress, $attemp, $tret, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return ['tjd_ut' => $tret->cdata];
+        return $this->getFFI()->swe_refrac_extended($inalt, $geoalt, $atpress, $attemp, $lapse_rate, $calc_flag, $dret);
     }
-    
-    // ========== AZIMUTH/ALTITUDE ==========
-    
-    public function swe_azalt(float $tjd_ut, int $calc_flag, array $geopos, array $xin, float $atpress = 1013.25, float $attemp = 15.0): array
+
+    public function swe_set_lapse_rate(float $lapse_rate): void
     {
-        $ffi = $this->getFFI();
-        $cGeopos = $ffi->new("double[3]");
-        $cXin = $ffi->new("double[3]");
-        $cXaz = $ffi->new("double[6]");
-        
-        $cGeopos[0] = $geopos[0];
-        $cGeopos[1] = $geopos[1];
-        $cGeopos[2] = $geopos[2];
-        $cXin[0] = $xin[0];
-        $cXin[1] = $xin[1];
-        $cXin[2] = $xin[2];
-        
-        $ffi->swe_azalt($tjd_ut, $calc_flag, $cGeopos, $atpress, $attemp, $cXin, $cXaz);
-        
-        return [
-            'azimuth' => $cXaz[0],
-            'altitude' => $cXaz[1],
-            'distance' => $cXaz[2],
-            'azimuth_speed' => $cXaz[3],
-            'altitude_speed' => $cXaz[4],
-            'distance_speed' => $cXaz[5],
-        ];
+        $this->getFFI()->swe_set_lapse_rate($lapse_rate);
     }
-    
-    // ========== NODE AND APSIS ==========
-    
-    public function swe_nod_aps(float $tjd_ut, int $ipl, int $iflag = 0, int $icalc = 0, ?string &$error = null): array|false
+
+    public function swe_azalt(float $tjd_ut, int $calc_flag, mixed $geopos, float $atpress, float $attemp, mixed $xin, mixed $xaz): void
     {
-        $ffi = $this->getFFI();
-        $xnasc = $ffi->new("double[6]");
-        $xndsc = $ffi->new("double[6]");
-        $xperi = $ffi->new("double[6]");
-        $xaphe = $ffi->new("double[6]");
-        $serr = $ffi->new("char[256]");
-        
-        $result = $ffi->swe_nod_aps($tjd_ut, $ipl, $iflag, $icalc, $xnasc, $xndsc, $xperi, $xaphe, $serr);
-        
-        if ($result === self::ERR) {
-            $error = FFI::string($serr);
-            return false;
-        }
-        
-        return [
-            'north_node' => [$xnasc[0], $xnasc[1], $xnasc[2]],
-            'south_node' => [$xndsc[0], $xndsc[1], $xndsc[2]],
-            'perihelion' => [$xperi[0], $xperi[1], $xperi[2]],
-            'aphelion' => [$xaphe[0], $xaphe[1], $xaphe[2]],
-        ];
+        $this->getFFI()->swe_azalt($tjd_ut, $calc_flag, $geopos, $atpress, $attemp, $xin, $xaz);
     }
-    
-    // ========== HELPER FUNCTIONS ==========
-    
-    public function swe_split_deg(float $degrees, int $roundflag = 0): array
+
+    public function swe_azalt_rev(float $tjd_ut, int $calc_flag, mixed $geopos, mixed $xin, mixed $xout): void
     {
-        $ffi = $this->getFFI();
-        $ideg = $ffi->new("int32");
-        $imin = $ffi->new("int32");
-        $isec = $ffi->new("int32");
-        $dsecfac = $ffi->new("double");
-        $isgn = $ffi->new("int32");
-        
-        $ffi->swe_split_deg($degrees, $roundflag, $ideg, $imin, $isec, $dsecfac, $isgn);
-        
-        return [
-            'degree' => $ideg->cdata,
-            'minute' => $imin->cdata,
-            'second' => $isec->cdata,
-            'second_fraction' => $dsecfac->cdata,
-            'is_negative' => $isgn->cdata != 0,
-        ];
+        $this->getFFI()->swe_azalt_rev($tjd_ut, $calc_flag, $geopos, $xin, $xout);
     }
-    
-    public function swe_cotrans(float $x, float $y, float $z, float $eps): array
+
+    public function swe_rise_trans_true_hor(float $tjd_ut, int $ipl, string|\FFI\CData $starname, int $epheflag, int $rsmi, mixed $geopos, float $atpress, float $attemp, float $horhgt, mixed $tret, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $cX = $ffi->new("double");
-        $cY = $ffi->new("double");
-        $cZ = $ffi->new("double");
-        
-        $cX->cdata = $x;
-        $cY->cdata = $y;
-        $cZ->cdata = $z;
-        
-        $ffi->swe_cotrans($cX, $cY, $cZ, $eps);
-        
-        return ['x' => $cX->cdata, 'y' => $cY->cdata, 'z' => $cZ->cdata];
+        return $this->getFFI()->swe_rise_trans_true_hor($tjd_ut, $ipl, $starname, $epheflag, $rsmi, $geopos, $atpress, $attemp, $horhgt, $tret, $serr);
     }
-    
-    public function swe_precess(array $x, float $eps, int $direction): array
+
+    public function swe_rise_trans(float $tjd_ut, int $ipl, string|\FFI\CData $starname, int $epheflag, int $rsmi, mixed $geopos, float $atpress, float $attemp, mixed $tret, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $cX = $ffi->new("double[3]");
-        $cX[0] = $x[0];
-        $cX[1] = $x[1];
-        $cX[2] = $x[2];
-        
-        $ffi->swe_precess($cX, $eps, $direction);
-        
-        return ['x' => $cX[0], 'y' => $cX[1], 'z' => $cX[2]];
+        return $this->getFFI()->swe_rise_trans($tjd_ut, $ipl, $starname, $epheflag, $rsmi, $geopos, $atpress, $attemp, $tret, $serr);
     }
-    
-    public function swe_get_constellation(array $x): string
+
+    public function swe_nod_aps(float $tjd_et, int $ipl, int $iflag, int $method, mixed $xnasc, mixed $xndsc, mixed $xperi, mixed $xaphe, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $sconst = $ffi->new("char[256]");
-        $cX = $ffi->new("double[3]");
-        
-        $cX[0] = $x[0];
-        $cX[1] = $x[1];
-        $cX[2] = $x[2];
-        
-        $ffi->swe_get_constellation($cX, $sconst);
-        
-        return FFI::string($sconst);
+        return $this->getFFI()->swe_nod_aps($tjd_et, $ipl, $iflag, $method, $xnasc, $xndsc, $xperi, $xaphe, $serr);
     }
-    
-    public function swe_get_planet_name(int $ipl): string
+
+    public function swe_nod_aps_ut(float $tjd_ut, int $ipl, int $iflag, int $method, mixed $xnasc, mixed $xndsc, mixed $xperi, mixed $xaphe, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $plname = $ffi->new("char[256]");
-        $ffi->swe_get_planet_name($ipl, $plname);
-        return FFI::string($plname);
+        return $this->getFFI()->swe_nod_aps_ut($tjd_ut, $ipl, $iflag, $method, $xnasc, $xndsc, $xperi, $xaphe, $serr);
     }
-    
-    public function swe_get_ecliptic_obliquity(float $tjd): float
+
+    public function swe_get_orbital_elements(float $tjd_et, int $ipl, int $iflag, mixed $dret, string|\FFI\CData $serr): int
     {
-        return $this->getFFI()->swe_get_ecliptic_obliquity($tjd);
+        return $this->getFFI()->swe_get_orbital_elements($tjd_et, $ipl, $iflag, $dret, $serr);
     }
-    
-    public function swe_nutation(float $tjd, int $iflag = 0): array
+
+    public function swe_orbit_max_min_true_distance(float $tjd_et, int $ipl, int $iflag, mixed $dmax, mixed $dmin, mixed $dtrue, string|\FFI\CData $serr): int
     {
-        $ffi = $this->getFFI();
-        $nut = $ffi->new("double[2]");
-        $eps = $ffi->new("double[2]");
-        
-        $ffi->swe_nutation($tjd, $iflag, $nut, $eps);
-        
-        return [
-            'nutation_longitude' => $nut[0],
-            'nutation_latitude' => $nut[1],
-            'mean_obliquity' => $eps[0],
-            'true_obliquity' => $eps[1],
-        ];
+        return $this->getFFI()->swe_orbit_max_min_true_distance($tjd_et, $ipl, $iflag, $dmax, $dmin, $dtrue, $serr);
     }
-    
-    public function swe_time_equ(float $tjd): float
+
+    public function swe_deltat(float $tjd): float
     {
-        return $this->getFFI()->swe_time_equ($tjd);
+        return $this->getFFI()->swe_deltat($tjd);
+    }
+
+    public function swe_deltat_ex(float $tjd, int $iflag, string|\FFI\CData $serr): float
+    {
+        return $this->getFFI()->swe_deltat_ex($tjd, $iflag, $serr);
+    }
+
+    public function swe_time_equ(float $tjd, mixed $te, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_time_equ($tjd, $te, $serr);
+    }
+
+    public function swe_lmt_to_lat(float $tjd_lmt, float $geolon, mixed $tjd_lat, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lmt_to_lat($tjd_lmt, $geolon, $tjd_lat, $serr);
+    }
+
+    public function swe_lat_to_lmt(float $tjd_lat, float $geolon, mixed $tjd_lmt, string|\FFI\CData $serr): int
+    {
+        return $this->getFFI()->swe_lat_to_lmt($tjd_lat, $geolon, $tjd_lmt, $serr);
+    }
+
+    public function swe_sidtime0(float $tjd_ut, float $eps, float $nut): float
+    {
+        return $this->getFFI()->swe_sidtime0($tjd_ut, $eps, $nut);
+    }
+
+    public function swe_sidtime(float $tjd_ut): float
+    {
+        return $this->getFFI()->swe_sidtime($tjd_ut);
+    }
+
+    public function swe_set_interpolate_nut(int $do_interpolate): void
+    {
+        $this->getFFI()->swe_set_interpolate_nut($do_interpolate);
+    }
+
+    public function swe_cotrans(mixed $xpo, mixed $xpn, float $eps): void
+    {
+        $this->getFFI()->swe_cotrans($xpo, $xpn, $eps);
+    }
+
+    public function swe_cotrans_sp(mixed $xpo, mixed $xpn, float $eps): void
+    {
+        $this->getFFI()->swe_cotrans_sp($xpo, $xpn, $eps);
+    }
+
+    public function swe_get_tid_acc(): float
+    {
+        return $this->getFFI()->swe_get_tid_acc();
+    }
+
+    public function swe_set_tid_acc(float $t_acc): void
+    {
+        $this->getFFI()->swe_set_tid_acc($t_acc);
+    }
+
+    public function swe_set_delta_t_userdef(float $dt): void
+    {
+        $this->getFFI()->swe_set_delta_t_userdef($dt);
+    }
+
+    public function swe_degnorm(float $x): float
+    {
+        return $this->getFFI()->swe_degnorm($x);
+    }
+
+    public function swe_radnorm(float $x): float
+    {
+        return $this->getFFI()->swe_radnorm($x);
+    }
+
+    public function swe_rad_midp(float $x1, float $x0): float
+    {
+        return $this->getFFI()->swe_rad_midp($x1, $x0);
+    }
+
+    public function swe_deg_midp(float $x1, float $x0): float
+    {
+        return $this->getFFI()->swe_deg_midp($x1, $x0);
+    }
+
+    public function swe_split_deg(float $ddeg, int $roundflag, mixed $ideg, mixed $imin, mixed $isec, mixed $dsecfr, mixed $isgn): void
+    {
+        $this->getFFI()->swe_split_deg($ddeg, $roundflag, $ideg, $imin, $isec, $dsecfr, $isgn);
+    }
+
+    public function swe_csnorm(int $p): int
+    {
+        return $this->getFFI()->swe_csnorm($p);
+    }
+
+    public function swe_difcsn(int $p1, int $p2): int
+    {
+        return $this->getFFI()->swe_difcsn($p1, $p2);
+    }
+
+    public function swe_difdegn(float $p1, float $p2): float
+    {
+        return $this->getFFI()->swe_difdegn($p1, $p2);
+    }
+
+    public function swe_difcs2n(int $p1, int $p2): int
+    {
+        return $this->getFFI()->swe_difcs2n($p1, $p2);
+    }
+
+    public function swe_difdeg2n(float $p1, float $p2): float
+    {
+        return $this->getFFI()->swe_difdeg2n($p1, $p2);
+    }
+
+    public function swe_difrad2n(float $p1, float $p2): float
+    {
+        return $this->getFFI()->swe_difrad2n($p1, $p2);
+    }
+
+    public function swe_csroundsec(int $x): int
+    {
+        return $this->getFFI()->swe_csroundsec($x);
+    }
+
+    public function swe_d2l(float $x): int
+    {
+        return $this->getFFI()->swe_d2l($x);
+    }
+
+    public function swe_day_of_week(float $jd): int
+    {
+        return $this->getFFI()->swe_day_of_week($jd);
+    }
+
+    public function swe_cs2timestr(int $t, int $sep, int $suppressZero, string|\FFI\CData $a): ?string
+    {
+        $ptr = $this->getFFI()->swe_cs2timestr($t, $sep, $suppressZero, $a);
+        return $ptr !== null ? \FFI::string($ptr) : null;
+    }
+
+    public function swe_cs2lonlatstr(int $t, mixed $pchar, mixed $mchar, string|\FFI\CData $s): ?string
+    {
+        $ptr = $this->getFFI()->swe_cs2lonlatstr($t, $pchar, $mchar, $s);
+        return $ptr !== null ? \FFI::string($ptr) : null;
+    }
+
+    public function swe_cs2degstr(int $t, string|\FFI\CData $a): ?string
+    {
+        $ptr = $this->getFFI()->swe_cs2degstr($t, $a);
+        return $ptr !== null ? \FFI::string($ptr) : null;
     }
 }
