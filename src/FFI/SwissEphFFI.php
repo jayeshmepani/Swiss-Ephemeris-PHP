@@ -405,6 +405,7 @@ class SwissEphFFI
     private function findLibrary(): string
     {
         $paths = [
+            __DIR__ . '/../../libs/linux-x64/libswe.so',
             __DIR__ . '/../../build/libswe.so',
             '/usr/local/lib/libswe.so',
             '/usr/lib/libswe.so',
@@ -412,7 +413,7 @@ class SwissEphFFI
         foreach ($paths as $path) {
             if (file_exists($path)) return $path;
         }
-        return __DIR__ . '/../../build/libswe.so';
+        return __DIR__ . '/../../libs/linux-x64/libswe.so';
     }
     
     // ======== C DEFINITIONS ========
