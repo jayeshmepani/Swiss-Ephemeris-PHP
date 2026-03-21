@@ -1,9 +1,17 @@
 {
-    "name": "swisseph/php-ffi",
-    "description": "Complete PHP FFI Wrapper for Swiss Ephemeris C Library",
+    "name": "jayeshmepani/swiss-ephemeris-ffi",
+    "description": "Complete 100% 1:1 PHP FFI Wrapper for the Swiss Ephemeris C Library",
     "type": "library",
-    "keywords": ["swiss-ephemeris", "astrology", "astronomy", "ffi", "ephemeris"],
+    "keywords": ["swiss-ephemeris", "astrology", "astronomy", "ffi", "ephemeris", "php-ffi", "vedic-astrology", "jyotish", "horoscope", "kundli", "astrology-api", "birth-chart"],
+    "homepage": "https://github.com/jayeshmepani/Swiss-Ephemeris-PHP",
     "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Jayesh Mepani",
+            "email": "jayeshmepani@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^8.3",
         "ext-ffi": "*"
@@ -30,5 +38,11 @@
     "scripts": {
         "build": "bash build/compile.sh",
         "test": "phpunit"
-    }
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/jayeshmepani"
+        }
+    ]
 }
