@@ -1,0 +1,25 @@
+# Composer
+/vendor/
+
+# Build artifacts
+/build/*.so
+/build/*.o
+/build/swisseph_src/
+/build/sweph.tar.gz
+/build/ephe/
+
+# IDE
+/.idea/
+/.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP
+.phpunit.result.cache
+.php-cs-fixer.cache
+
+# Logs
+*.log
