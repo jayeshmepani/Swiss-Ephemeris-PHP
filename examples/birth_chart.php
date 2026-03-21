@@ -16,7 +16,9 @@ use SwissEph\FFI\SwissEphFFI;
 // Initialize Swiss Ephemeris
 $sweph = new SwissEphFFI();
 
-echo "Swiss Ephemeris Version: " . $sweph->swe_version() . "\n\n";
+$versionStr = $sweph->getFFI()->new("char[256]");
+$sweph->swe_version($versionStr);
+echo "Swiss Ephemeris Version: " . \FFI::string($versionStr) . "\n\n";
 
 // Birth data
 $birthData = [
@@ -40,7 +42,8 @@ $julianDay = $sweph->swe_julday(
     $birthData['year'],
     $birthData['month'],
     $birthData['day'],
-    $birthData['hour']
+    $birthData['hour'],
+    SwissEphFFI::SE_GREG_CAL
 );
 
 echo "Julian Day: $julianDay\n\n";
@@ -64,22 +67,28 @@ $planets = [
 echo "Planetary Positions (Tropical Zodiac)\n";
 echo "--------------------------------------\n";
 
+$xx = $sweph->getFFI()->new("double[6]");
+$serr = $sweph->getFFI()->new("char[256]");
+
 foreach ($planets as $name => $id) {
-    $position = $sweph->swe_calc_ut($julianDay, $id);
+    $result = $sweph->swe_calc_ut($julianDay, $id, SwissEphFFI::SEFLG_SPEED, $xx, $serr);
     
-    if ($position !== false) {
+    if ($result !== SwissEphFFI::ERR) {
+        $longitude = $xx[0];
+        $longitude_speed = $xx[3];
+
         // Convert to sign-degree format
-        $sign = floor($position['longitude'] / 30);
-        $degree = $position['longitude'] % 30;
+        $sign = floor($longitude / 30);
+        $degree = $longitude - ($sign * 30);
         
         $signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 
                   'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
         
         printf("%-12s: %3s %8.2f° (Speed: %+.4f°/day)\n",
             $name,
-            $signs[$sign],
+            $signs[(int)$sign],
             $degree,
-            $position['longitude_speed']
+            $longitude_speed
         );
     }
 }
@@ -90,32 +99,41 @@ echo "\n";
 echo "House Cusps (Placidus)\n";
 echo "-----------------------\n";
 
-$houses = $sweph->swe_houses(
+$cusps = $sweph->getFFI()->new("double[13]");
+$ascmc = $sweph->getFFI()->new("double[10]");
+
+$result = $sweph->swe_houses(
     $julianDay,
     $birthData['latitude'],
     $birthData['longitude'],
-    'P' // Placidus
+    ord(SwissEphFFI::SE_HOUSES_PLACIDUS),
+    $cusps,
+    $ascmc
 );
 
-if ($houses !== false) {
-    foreach ($houses['cusps'] as $house => $longitude) {
+if ($result !== SwissEphFFI::ERR) {
+    for ($i = 1; $i <= 12; $i++) {
+        $longitude = $cusps[$i];
         $sign = floor($longitude / 30);
-        $degree = $longitude % 30;
+        $degree = $longitude - ($sign * 30);
         
         $signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 
                   'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
         
-        printf("House %2d: %3s %8.2f°\n", $house, $signs[$sign], $degree);
+        printf("House %2d: %3s %8.2f°\n", $i, $signs[(int)$sign], $degree);
     }
     
     echo "\n";
+    $ascendant = $ascmc[0];
+    $mc = $ascmc[1];
+
     printf("Ascendant: %3s %8.2f°\n", 
-        $signs[floor($houses['ascendant'] / 30)], 
-        $houses['ascendant'] % 30
+        $signs[(int)floor($ascendant / 30)],
+        $ascendant - floor($ascendant / 30) * 30
     );
     printf("Midheaven (MC): %3s %8.2f°\n", 
-        $signs[floor($houses['mc'] / 30)], 
-        $houses['mc'] % 30
+        $signs[(int)floor($mc / 30)],
+        $mc - floor($mc / 30) * 30
     );
 }
 
@@ -129,27 +147,28 @@ echo "Ayanamsa (Lahiri): $ayanamsa°\n";
 echo "\nSidereal Positions (with Ayanamsa)\n";
 echo "-----------------------------------\n";
 
-$sweph->swe_set_sid_mode(0); // Fagan/Bradley
+$sweph->swe_set_sid_mode(SwissEphFFI::SE_SIDM_LAHIRI, 0.0, 0.0); // Lahiri
 
 foreach (array_slice($planets, 0, 7) as $name => $id) {
-    $position = $sweph->swe_calc_ut($julianDay, $id, SwissEphFFI::SEFLG_SIDEREAL);
+    $result = $sweph->swe_calc_ut($julianDay, $id, SwissEphFFI::SEFLG_SIDEREAL, $xx, $serr);
     
-    if ($position !== false) {
-        $sign = floor($position['longitude'] / 30);
-        $degree = $position['longitude'] % 30;
+    if ($result !== SwissEphFFI::ERR) {
+        $longitude = $xx[0];
+        $sign = floor($longitude / 30);
+        $degree = $longitude - ($sign * 30);
         
         $signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 
                   'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
         
         printf("%-12s: %3s %8.2f°\n",
             $name,
-            $signs[$sign],
+            $signs[(int)$sign],
             $degree
         );
     }
 }
 
 // Reset to tropical
-$sweph->swe_set_sid_mode(0);
+$sweph->swe_set_sid_mode(0, 0.0, 0.0);
 
 echo "\nDone!\n";
