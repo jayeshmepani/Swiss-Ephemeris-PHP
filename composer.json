@@ -99,7 +99,6 @@
             "@swisseph:fetch-libs"
         ],
         "test": "phpunit",
-        "test:coverage": "phpunit --coverage-html=coverage",
         "lint:check": "vendor/bin/pint --test",
         "phpstan": "vendor/bin/phpstan analyse",
         "lint": [

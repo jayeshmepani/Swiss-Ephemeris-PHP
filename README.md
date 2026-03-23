@@ -224,9 +224,6 @@ Ensure `composer install` is run, then execute the test suite:
 # Run all tests
 composer test
 
-# Run tests with coverage
-composer test:coverage
-
 # Check code quality
 composer quality
 ```
