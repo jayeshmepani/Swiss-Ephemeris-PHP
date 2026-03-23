@@ -1,0 +1,10 @@
+parameters:
+    level: 5
+    paths:
+        - src/
+        - config/
+        - examples/
+    excludePaths:
+        - tests/
+    ignoreErrors:
+        - '#Call to an undefined method FFI::swe_#'

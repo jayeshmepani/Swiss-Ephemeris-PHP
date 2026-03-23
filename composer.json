@@ -1,15 +1,51 @@
 {
     "name": "jayeshmepani/swiss-ephemeris-ffi",
-    "description": "Complete 100% 1:1 PHP FFI Wrapper for the Swiss Ephemeris C Library",
+    "description": "Complete 100% 1:1 PHP FFI Wrapper for the Swiss Ephemeris C Library - Direct C function calls with zero abstraction for maximum astronomical precision",
     "type": "library",
-    "keywords": ["swiss-ephemeris", "astrology", "astronomy", "ffi", "ephemeris", "php-ffi", "vedic-astrology", "jyotish", "horoscope", "kundli", "astrology-api", "birth-chart"],
+    "keywords": [
+        "swiss-ephemeris",
+        "astrology",
+        "astronomy",
+        "ffi",
+        "ephemeris",
+        "php-ffi",
+        "vedic-astrology",
+        "jyotish",
+        "horoscope",
+        "kundli",
+        "astrology-api",
+        "birth-chart",
+        "planetary-positions",
+        "ayanamsa",
+        "sidereal",
+        "tropical",
+        "houses",
+        "eclipse",
+        "laravel-package",
+        "php-library"
+    ],
     "homepage": "https://github.com/jayeshmepani/Swiss-Ephemeris-PHP",
+    "readme": "README.md",
     "license": "GPL-2.0-or-later",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "authors": [
         {
-            "name": "Jayesh Mepani",
-            "email": "jayeshmepani@gmail.com",
+            "name": "Jayesh Patel",
+            "email": "jayeshmepani777@gmail.com",
+            "homepage": "https://github.com/jayeshmepani",
             "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/issues",
+        "source": "https://github.com/jayeshmepani/Swiss-Ephemeris-PHP",
+        "email": "jayeshmepani777@gmail.com"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/jayeshmepani"
         }
     ],
     "require": {
@@ -17,7 +53,15 @@
         "ext-ffi": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5 || ^11.0",
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "laravel/pint": "^1.13",
+        "phpstan/phpstan": "^1.10",
+        "nunomaduro/collision": "^8.0",
+        "mockery/mockery": "^1.6"
+    },
+    "conflict": {
+        "php": "<8.3"
     },
     "autoload": {
         "psr-4": {
@@ -31,18 +75,43 @@
     },
     "extra": {
         "laravel": {
-            "providers": ["SwissEph\\Service\\SwissEphServiceProvider"],
-            "aliases": {"SwissEph": "SwissEph\\Service\\SwissEphFacade"}
+            "providers": [
+                "SwissEph\\Service\\SwissEphServiceProvider"
+            ],
+            "aliases": {
+                "SwissEph": "SwissEph\\Service\\SwissEphFacade"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     },
     "scripts": {
-        "build": "bash build/compile.sh",
-        "test": "phpunit"
-    },
-    "funding": [
-        {
-            "type": "github",
-            "url": "https://github.com/jayeshmepani"
-        }
-    ]
+        "build": "php build/build.php",
+        "swisseph:fetch-libs": "php build/fetch-prebuilt.php",
+        "post-install-cmd": [
+            "@swisseph:fetch-libs"
+        ],
+        "post-update-cmd": [
+            "@swisseph:fetch-libs"
+        ],
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html=coverage",
+        "lint:check": "vendor/bin/pint --test",
+        "phpstan": "vendor/bin/phpstan analyse",
+        "lint": [
+            "pint"
+        ],
+        "test:lint": [
+            "pint --test"
+        ],
+        "quality": [
+            "@lint:check",
+            "@phpstan",
+            "@test"
+        ]
+    }
 }

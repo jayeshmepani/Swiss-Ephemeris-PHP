@@ -3,10 +3,15 @@
 declare(strict_types=1);
 
 /**
- * Birth Chart Calculation Example
- * 
- * This example demonstrates how to calculate a complete birth chart
- * including planetary positions and house cusps.
+ * Birth Chart Calculation Example.
+ *
+ * Demonstrates complete birth chart calculation including:
+ * - Planetary positions (tropical and sidereal)
+ * - House cusps (Placidus system)
+ * - Ascendant and Midheaven
+ * - Ayanamsa calculation
+ *
+ * @see https://www.astro.com/swisseph/swephprg.htm Swiss Ephemeris Documentation
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -14,21 +19,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use SwissEph\FFI\SwissEphFFI;
 
 // Initialize Swiss Ephemeris
-$sweph = new SwissEphFFI();
+$sweph = new SwissEphFFI;
 
-$versionStr = $sweph->getFFI()->new("char[256]");
+// Get and display library version
+$versionStr = $sweph->getFFI()->new('char[256]');
 $sweph->swe_version($versionStr);
-echo "Swiss Ephemeris Version: " . \FFI::string($versionStr) . "\n\n";
+echo 'Swiss Ephemeris Version: ' . FFI::string($versionStr) . "\n\n";
 
-// Birth data
+// Birth data: May 15, 1990, 14:30 UT, New York
 $birthData = [
     'year' => 1990,
     'month' => 5,
     'day' => 15,
-    'hour' => 14.5, // 14:30
-    'latitude' => 40.7128, // New York
+    'hour' => 14.5,
+    'latitude' => 40.7128,
     'longitude' => -74.0060,
-    'timezone' => -5.0, // EST
+    'timezone' => -5.0,
 ];
 
 echo "Birth Chart Calculation\n";
@@ -37,7 +43,7 @@ echo "Date: {$birthData['year']}-{$birthData['month']}-{$birthData['day']}\n";
 echo "Time: {$birthData['hour']} (UT)\n";
 echo "Location: {$birthData['latitude']}, {$birthData['longitude']}\n\n";
 
-// Convert to Julian Day
+// Convert birth date to Julian Day (continuous time scale used in astronomy)
 $julianDay = $sweph->swe_julday(
     $birthData['year'],
     $birthData['month'],
@@ -48,7 +54,7 @@ $julianDay = $sweph->swe_julday(
 
 echo "Julian Day: $julianDay\n\n";
 
-// Calculate planetary positions
+// Planet IDs from Swiss Ephemeris
 $planets = [
     'Sun' => SwissEphFFI::SE_SUN,
     'Moon' => SwissEphFFI::SE_MOON,
@@ -67,108 +73,93 @@ $planets = [
 echo "Planetary Positions (Tropical Zodiac)\n";
 echo "--------------------------------------\n";
 
-$xx = $sweph->getFFI()->new("double[6]");
-$serr = $sweph->getFFI()->new("char[256]");
+// Allocate C arrays for results
+$xx = $sweph->getFFI()->new('double[6]');  // 6 values: lon, lat, dist, speed_lon, speed_lat, speed_dist
+$serr = $sweph->getFFI()->new('char[256]'); // Error message buffer
+$signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
 
 foreach ($planets as $name => $id) {
+    // Calculate planet position with speed
     $result = $sweph->swe_calc_ut($julianDay, $id, SwissEphFFI::SEFLG_SPEED, $xx, $serr);
-    
-    if ($result !== SwissEphFFI::ERR) {
-        $longitude = $xx[0];
-        $longitude_speed = $xx[3];
 
-        // Convert to sign-degree format
-        $sign = floor($longitude / 30);
-        $degree = $longitude - ($sign * 30);
-        
-        $signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 
-                  'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
-        
+    if ($result !== SwissEphFFI::ERR) {
+        // Convert longitude to sign-degree format
+        $sign = (int) floor($xx[0] / 30);
+        $degree = $xx[0] - ($sign * 30);
+
         printf("%-12s: %3s %8.2f° (Speed: %+.4f°/day)\n",
             $name,
-            $signs[(int)$sign],
+            $signs[$sign],
             $degree,
-            $longitude_speed
+            $xx[3]
         );
     }
 }
 
 echo "\n";
 
-// Calculate house cusps
+// Calculate house cusps using Placidus system
 echo "House Cusps (Placidus)\n";
 echo "-----------------------\n";
 
-$cusps = $sweph->getFFI()->new("double[13]");
-$ascmc = $sweph->getFFI()->new("double[10]");
+$cusps = $sweph->getFFI()->new('double[13]');  // 12 cusps + 1 unused
+$ascmc = $sweph->getFFI()->new('double[10]');  // Ascendant, MC, and other sensitive points
 
 $result = $sweph->swe_houses(
     $julianDay,
     $birthData['latitude'],
     $birthData['longitude'],
-    ord(SwissEphFFI::SE_HOUSES_PLACIDUS),
+    ord(SwissEphFFI::SE_HOUSES_PLACIDUS),  // 'P' = Placidus
     $cusps,
     $ascmc
 );
 
 if ($result !== SwissEphFFI::ERR) {
     for ($i = 1; $i <= 12; $i++) {
-        $longitude = $cusps[$i];
-        $sign = floor($longitude / 30);
-        $degree = $longitude - ($sign * 30);
-        
-        $signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 
-                  'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
-        
-        printf("House %2d: %3s %8.2f°\n", $i, $signs[(int)$sign], $degree);
-    }
-    
-    echo "\n";
-    $ascendant = $ascmc[0];
-    $mc = $ascmc[1];
+        $sign = (int) floor($cusps[$i] / 30);
+        $degree = $cusps[$i] - ($sign * 30);
 
-    printf("Ascendant: %3s %8.2f°\n", 
-        $signs[(int)floor($ascendant / 30)],
-        $ascendant - floor($ascendant / 30) * 30
+        printf("House %2d: %3s %8.2f°\n", $i, $signs[$sign], $degree);
+    }
+
+    echo "\n";
+    // Ascendant (1st house cusp)
+    printf("Ascendant: %3s %8.2f°\n",
+        $signs[(int) floor($ascmc[0] / 30)],
+        $ascmc[0] - floor($ascmc[0] / 30) * 30
     );
-    printf("Midheaven (MC): %3s %8.2f°\n", 
-        $signs[(int)floor($mc / 30)],
-        $mc - floor($mc / 30) * 30
+    // Midheaven (10th house cusp)
+    printf("Midheaven (MC): %3s %8.2f°\n",
+        $signs[(int) floor($ascmc[1] / 30)],
+        $ascmc[1] - floor($ascmc[1] / 30) * 30
     );
 }
 
 echo "\n";
 
-// Get ayanamsa
+// Get Lahiri ayanamsa (precession correction for sidereal calculations)
 $ayanamsa = $sweph->swe_get_ayanamsa_ut($julianDay);
-echo "Ayanamsa (Lahiri): $ayanamsa°\n";
+echo "Ayanamsa (Lahiri): {$ayanamsa}°\n";
 
-// Calculate sidereal positions
+// Calculate sidereal positions (Vedic astrology)
 echo "\nSidereal Positions (with Ayanamsa)\n";
 echo "-----------------------------------\n";
 
-$sweph->swe_set_sid_mode(SwissEphFFI::SE_SIDM_LAHIRI, 0.0, 0.0); // Lahiri
+// Set sidereal mode to Lahiri (most common in Vedic astrology)
+$sweph->swe_set_sid_mode(SwissEphFFI::SE_SIDM_LAHIRI, 0.0, 0.0);
 
 foreach (array_slice($planets, 0, 7) as $name => $id) {
     $result = $sweph->swe_calc_ut($julianDay, $id, SwissEphFFI::SEFLG_SIDEREAL, $xx, $serr);
-    
+
     if ($result !== SwissEphFFI::ERR) {
-        $longitude = $xx[0];
-        $sign = floor($longitude / 30);
-        $degree = $longitude - ($sign * 30);
-        
-        $signs = ['Ari', 'Tau', 'Gem', 'Can', 'Leo', 'Vir', 
-                  'Lib', 'Sco', 'Sag', 'Cap', 'Aqu', 'Pis'];
-        
-        printf("%-12s: %3s %8.2f°\n",
-            $name,
-            $signs[(int)$sign],
-            $degree
-        );
+        $sign = (int) floor($xx[0] / 30);
+        $degree = $xx[0] - ($sign * 30);
+
+        printf("%-12s: %3s %8.2f°\n", $name, $signs[$sign], $degree);
     }
 }
 
-// Reset to tropical
+// Reset to tropical zodiac
 $sweph->swe_set_sid_mode(0, 0.0, 0.0);
 
 echo "\nDone!\n";
