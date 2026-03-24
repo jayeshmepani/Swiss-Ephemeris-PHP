@@ -3,7 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/jayeshmepani/swiss-ephemeris-ffi.svg?style=flat-square)](https://packagist.org/packages/jayeshmepani/swiss-ephemeris-ffi)
 [![Total Downloads](https://img.shields.io/packagist/dt/jayeshmepani/swiss-ephemeris-ffi.svg?style=flat-square)](https://packagist.org/packages/jayeshmepani/swiss-ephemeris-ffi)
 [![PHP Version Require](https://img.shields.io/packagist/php-v/jayeshmepani/swiss-ephemeris-ffi?style=flat-square)](https://packagist.org/packages/jayeshmepani/swiss-ephemeris-ffi)
-[![License](https://img.shields.io/packagist/l/jayeshmepani/swiss-ephemeris-ffi.svg?style=flat-square)](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/jayeshmepani/Swiss-Ephemeris-PHP?style=flat-square)](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/LICENSE)
 [![Tests](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/tests.yml/badge.svg)](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/tests.yml)
 [![Release Prebuilt Libraries](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/release-prebuilt-libs.yml/badge.svg)](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/release-prebuilt-libs.yml)
 
