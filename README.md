@@ -816,7 +816,6 @@ If you use Swiss Ephemeris in commercial software or redistribute Swiss Ephemeri
 
 ## 🙏 Credits
 
-- **[Jayesh Patel](https://github.com/jayeshmepani)** - PHP FFI Wrapper Developer
 - **[Dieter Koch and Alois Treindl](https://www.astro.com/swisseph/)** - Original Swiss Ephemeris C Library Authors
 - **[Astrodienst AG](https://www.astro.com/)** - Swiss Ephemeris Maintainers
 
