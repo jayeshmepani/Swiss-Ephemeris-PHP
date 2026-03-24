@@ -66,8 +66,8 @@ echo \$sweph->swe_version() . PHP_EOL;
 
 ## License Compatibility
 
-This repository's PHP wrapper code is licensed under **MIT**.
+This repository is licensed under **AGPL-3.0-or-later**.
 
-However, the upstream Swiss Ephemeris C library and related ephemeris files remain subject to the Swiss Ephemeris upstream licensing model.
+The upstream Swiss Ephemeris C library and related ephemeris files remain subject to the Swiss Ephemeris upstream licensing model as well.
 
 If you use Swiss Ephemeris in commercial software, or redistribute upstream binaries/data, review the commercial licensing terms from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm).

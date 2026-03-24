@@ -803,13 +803,13 @@ If you find this package helpful, consider sponsoring the development:
 
 ## 📄 License
 
-The PHP wrapper code in this repository is licensed under the [MIT License](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/LICENSE).
+This repository is licensed under the [GNU Affero General Public License v3.0 or later](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/LICENSE).
 
 Important upstream notice:
 
 - This package wraps the Swiss Ephemeris C library.
-- Swiss Ephemeris upstream is separately licensed by Astrodienst under GPL/commercial terms.
-- Prebuilt binaries, locally compiled binaries, and official ephemeris data are not relicensed by this repository's MIT license.
+- Swiss Ephemeris upstream is separately offered by Astrodienst under AGPL/commercial terms.
+- Prebuilt binaries, locally compiled binaries, and official ephemeris data remain subject to the applicable Swiss Ephemeris upstream terms as well.
 
 If you use Swiss Ephemeris in commercial software or redistribute Swiss Ephemeris binaries/data, review the upstream licensing terms and commercial options from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm).
 
