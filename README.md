@@ -5,6 +5,7 @@
 [![PHP Version Require](https://img.shields.io/packagist/php-v/jayeshmepani/swiss-ephemeris-ffi?style=flat-square)](https://packagist.org/packages/jayeshmepani/swiss-ephemeris-ffi)
 [![License](https://img.shields.io/packagist/l/jayeshmepani/swiss-ephemeris-ffi.svg?style=flat-square)](https://packagist.org/packages/jayeshmepani/swiss-ephemeris-ffi)
 [![Tests](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/tests.yml/badge.svg)](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/tests.yml)
+[![Release Prebuilt Libraries](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/release-prebuilt-libs.yml/badge.svg)](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/actions/workflows/release-prebuilt-libs.yml)
 
 A strict, **100% precise, exact 1:1 FFI mapping** of the [Swiss Ephemeris](https://www.astro.com/swisseph/) C library for PHP 8.3+.
 
@@ -782,17 +783,17 @@ powershell -File build/compile-windows.ps1  # Windows
 
 - [Swiss Ephemeris Programmer's Documentation](https://www.astro.com/swisseph/swephprg.htm)
 - [Swiss Ephemeris Function Reference](https://www.astro.com/swisseph/swephfun.htm)
-- [Examples Directory](./examples/)
+- [Examples Directory](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/tree/main/examples)
 
 ## 🤝 Contributing
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
+Please see [CONTRIBUTING.md](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## 📞 Support
 
 - **Issues**: [GitHub Issues](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/issues)
 - **Email**: [jayeshmepani777@gmail.com](mailto:jayeshmepani777@gmail.com)
-- **Documentation**: [README.md](README.md)
+- **Documentation**: [README.md](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/README.md)
 
 ## 💖 Funding
 
@@ -802,9 +803,15 @@ If you find this package helpful, consider sponsoring the development:
 
 ## 📄 License
 
-This library is licensed under the GPL-2.0-or-later, mirroring the standard licensing options of the underlying Swiss Ephemeris project. See the [LICENSE.md](LICENSE.md) file for details.
+The PHP wrapper code in this repository is licensed under the [MIT License](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/LICENSE).
 
-**Note:** If you use this package in commercial software, you may need to purchase a commercial license from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm).
+Important upstream notice:
+
+- This package wraps the Swiss Ephemeris C library.
+- Swiss Ephemeris upstream is separately licensed by Astrodienst under GPL/commercial terms.
+- Prebuilt binaries, locally compiled binaries, and official ephemeris data are not relicensed by this repository's MIT license.
+
+If you use Swiss Ephemeris in commercial software or redistribute Swiss Ephemeris binaries/data, review the upstream licensing terms and commercial options from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm).
 
 ## 🙏 Credits
 

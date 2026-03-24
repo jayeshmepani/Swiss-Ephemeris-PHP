@@ -1,7 +1,7 @@
 # Swiss Ephemeris PHP FFI - Upstream Synchronization Report
 
 **Generated**: March 23, 2026  
-**Upstream Repository**: https://github.com/aloistr/swisseph
+**Upstream Repository**: [aloistr/swisseph](https://github.com/aloistr/swisseph)
 
 ---
 
@@ -15,12 +15,12 @@ Your PHP FFI wrapper is configured to **automatically track the latest version**
 
 | Attribute | Value |
 |-----------|-------|
-| **Repository** | https://github.com/aloistr/swisseph |
+| **Repository** | [aloistr/swisseph](https://github.com/aloistr/swisseph) |
 | **Latest Release** | v2.10.03 (September 9, 2022) |
 | **Development Branch** | `master` (actively maintained) |
 | **Last Commit** | March 11, 2026 |
 | **Latest Commit Message** | "fixed old rounding bug in swe_split_deg()" |
-| **License** | Dual: GPL-2.0-or-later OR Commercial |
+| **Upstream License** | Dual: GPL-2.0-or-later OR Commercial |
 
 ---
 
@@ -189,10 +189,10 @@ git log HEAD..origin/master --oneline
 
 ## 📞 Support & Resources
 
-- **Upstream Issues**: https://github.com/aloistr/swisseph/issues
-- **Your Package Issues**: https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/issues
-- **Official Documentation**: https://www.astro.com/swisseph/swephprg.htm
-- **Version Tracking**: See `VERSION.md` in this repository
+- **Upstream Issues**: [aloistr/swisseph issues](https://github.com/aloistr/swisseph/issues)
+- **Your Package Issues**: [Swiss-Ephemeris-PHP issues](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/issues)
+- **Official Documentation**: [Swiss Ephemeris Programmer's Documentation](https://www.astro.com/swisseph/swephprg.htm)
+- **Version Tracking**: [VERSION.md](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/VERSION.md)
 
 ---
 
@@ -207,4 +207,4 @@ git log HEAD..origin/master --oneline
 
 ---
 
-**Conclusion**: Your Swiss Ephemeris PHP FFI wrapper is **properly configured** to stay up-to-date with the upstream Swiss Ephemeris C library. Users always get the latest bug fixes and improvements when they rebuild the library.
+**Conclusion**: Your Swiss Ephemeris PHP FFI wrapper is **properly configured** to stay up-to-date with the upstream Swiss Ephemeris C library. Users always get the latest bug fixes and improvements when they rebuild the library, but upstream Swiss Ephemeris licensing still applies to the C library, binaries, and ephemeris data.

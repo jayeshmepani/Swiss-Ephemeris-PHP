@@ -132,7 +132,9 @@ This package aims for **100% 1:1 compatibility** with the Swiss Ephemeris C libr
 
 ### Swiss Ephemeris Licensing
 
-Remember that Swiss Ephemeris is dual-licensed (GPL or Commercial). Your contributions must comply with one of these licenses.
+This repository's PHP wrapper code is MIT-licensed, but it interfaces with Swiss Ephemeris upstream, which has its own GPL/commercial licensing terms.
+
+Contributions to this repository are therefore accepted under the MIT license for the wrapper code, while use or redistribution of upstream Swiss Ephemeris binaries/data must still respect the upstream license.
 
 ## Release Process
 

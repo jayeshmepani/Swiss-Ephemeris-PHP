@@ -6,7 +6,7 @@ This document tracks the Swiss Ephemeris C library version used in this PHP FFI 
 
 | Attribute | Value |
 |-----------|-------|
-| **Upstream Repository** | https://github.com/aloistr/swisseph |
+| **Upstream Repository** | [aloistr/swisseph](https://github.com/aloistr/swisseph) |
 | **Latest Release Tag** | v2.10.03 (September 9, 2022) |
 | **Development Branch** | `master` (actively maintained) |
 | **Last Upstream Commit** | March 11, 2026 |
@@ -59,13 +59,15 @@ echo \$sweph->swe_version() . PHP_EOL;
 
 ## Upstream Repository Links
 
-- **GitHub**: https://github.com/aloistr/swisseph
-- **Releases**: https://github.com/aloistr/swisseph/releases
-- **Commits**: https://github.com/aloistr/swisseph/commits/master
-- **Official Site**: https://www.astro.com/swisseph/
+- **GitHub**: [aloistr/swisseph](https://github.com/aloistr/swisseph)
+- **Releases**: [Swiss Ephemeris releases](https://github.com/aloistr/swisseph/releases)
+- **Commits**: [master branch commits](https://github.com/aloistr/swisseph/commits/master)
+- **Official Site**: [astro.com Swiss Ephemeris](https://www.astro.com/swisseph/)
 
 ## License Compatibility
 
-This PHP FFI wrapper is licensed under **GPL-2.0-or-later**, which is compatible with the Swiss Ephemeris dual licensing model (GPL or Commercial).
+This repository's PHP wrapper code is licensed under **MIT**.
 
-If you use this package in commercial software, you may need to purchase a commercial license from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm).
+However, the upstream Swiss Ephemeris C library and related ephemeris files remain subject to the Swiss Ephemeris upstream licensing model.
+
+If you use Swiss Ephemeris in commercial software, or redistribute upstream binaries/data, review the commercial licensing terms from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm).
