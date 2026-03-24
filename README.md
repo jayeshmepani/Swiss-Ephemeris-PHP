@@ -475,7 +475,7 @@ $jd = SwissEph::swe_julday(2000, 1, 1, 12.0, SwissEph::SE_GREG_CAL);
 | **100% Coverage** | ✅ Yes | ✅ ~106 functions | ✅ 106 functions | ❌ Limited |
 | **Direct C Access** | ✅ Yes | ✅ Yes | ❌ No | ❌ No |
 | **Compilation** | ✅ Prebuilt or auto-download | ✅ Yes | ❌ No | ❌ No |
-| **Speed** | ⚡ Fast | ⚡ Fastest | 🐌 Slower | 🐌 Slowest |
+| **Performance** | **Native C speed** (excellent real-world performance) | **Native C speed** (zero FFI overhead) | PHP implementation | CLI process overhead |
 | **Precision** | ✅ Exact C | ✅ Exact C | ⚠️ PHP implementation | ⚠️ Text parsing |
 
 ## Requirements
