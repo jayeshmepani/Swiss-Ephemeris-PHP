@@ -10,6 +10,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test:
     name: PHP 8.3 Tests
@@ -26,8 +29,8 @@ jobs:
           extensions: ffi
           coverage: none
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+      - name: Update dependencies for PHP 8.3
+        run: composer update --no-interaction --prefer-dist
 
       - name: Run test suite
         run: composer test

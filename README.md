@@ -793,7 +793,8 @@ Please see [CONTRIBUTING.md](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP
 
 - **Issues**: [GitHub Issues](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/issues)
 - **Email**: [jayeshmepani777@gmail.com](mailto:jayeshmepani777@gmail.com)
-- **Documentation**: [README.md](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/blob/main/README.md)
+- **Examples**: [examples/](https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/tree/main/examples)
+- **Swiss Ephemeris Reference**: [Programmer's Documentation](https://www.astro.com/swisseph/swephprg.htm)
 
 ## 💖 Funding
 
