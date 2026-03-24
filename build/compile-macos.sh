@@ -23,15 +23,25 @@ echo ""
 mkdir -p "$BUILD_DIR" "$OUT_DIR"
 cd "$BUILD_DIR"
 
-if [ ! -d "$SRC_DIR" ]; then
+NEEDS_CLONE=1
+if [ -d "$SRC_DIR" ]; then
+  if git -C "$SRC_DIR" rev-parse --verify HEAD >/dev/null 2>&1; then
+    NEEDS_CLONE=0
+  else
+    echo "Existing source checkout is invalid. Recreating..."
+    rm -rf "$SRC_DIR"
+  fi
+fi
+
+if [ "$NEEDS_CLONE" -eq 1 ]; then
   echo "Step 1: Downloading Swiss Ephemeris source..."
   echo "Source: https://github.com/aloistr/swisseph (latest commit)"
   git clone --depth 1 https://github.com/aloistr/swisseph.git swisseph_src
 else
   echo "Step 1: Updating existing source..."
-  cd "$SRC_DIR"
-  git pull origin master
-  cd "$BUILD_DIR"
+  rm -f "$SRC_DIR/.git/shallow.lock"
+  git -C "$SRC_DIR" fetch --depth 1 origin master
+  git -C "$SRC_DIR" reset --hard FETCH_HEAD
 fi
 
 cd "$SRC_DIR"

@@ -20,7 +20,18 @@ New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 Set-Location $buildDir
 
-if (-Not (Test-Path $srcDir)) {
+$needsClone = $true
+if (Test-Path $srcDir) {
+    $headCheck = Start-Process -FilePath git -ArgumentList @("-C", $srcDir, "rev-parse", "--verify", "HEAD") -NoNewWindow -Wait -PassThru
+    if ($headCheck.ExitCode -eq 0) {
+        $needsClone = $false
+    } else {
+        Write-Host "Existing source checkout is invalid. Recreating..."
+        Remove-Item -Recurse -Force $srcDir
+    }
+}
+
+if ($needsClone) {
     Write-Host "Step 1: Downloading Swiss Ephemeris source..."
     Write-Host "Source: https://github.com/aloistr/swisseph (latest commit)"
     git clone --depth 1 https://github.com/aloistr/swisseph.git swisseph_src
@@ -30,9 +41,12 @@ if (-Not (Test-Path $srcDir)) {
     }
 } else {
     Write-Host "Step 1: Updating existing source..."
-    Set-Location $srcDir
-    git pull origin master
-    Set-Location $buildDir
+    $shallowLock = Join-Path $srcDir ".git\\shallow.lock"
+    if (Test-Path $shallowLock) {
+        Remove-Item -Force $shallowLock
+    }
+    git -C $srcDir fetch --depth 1 origin master
+    git -C $srcDir reset --hard FETCH_HEAD
 }
 
 Set-Location $srcDir
