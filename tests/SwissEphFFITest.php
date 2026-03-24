@@ -6,6 +6,7 @@ namespace SwissEph\Tests;
 
 use FFI;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SwissEph\FFI\SwissEphFFI;
 
 /**
@@ -37,13 +38,11 @@ final class SwissEphFFITest extends TestCase
     {
         parent::setUp();
 
-        if (!file_exists(__DIR__ . '/../build/libswe.so')) {
-            $this->markTestSkipped(
-                'Swiss Ephemeris library not compiled. Run: bash build/compile.sh'
-            );
+        try {
+            $this->sweph = new SwissEphFFI;
+        } catch (RuntimeException $e) {
+            $this->markTestSkipped('Swiss Ephemeris library not found: ' . $e->getMessage());
         }
-
-        $this->sweph = new SwissEphFFI;
     }
 
     /**

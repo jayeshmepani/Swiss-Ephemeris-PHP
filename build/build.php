@@ -9,7 +9,21 @@ if ($family === 'Windows') {
         fwrite(STDERR, "Missing build script: {$script}\n");
         exit(1);
     }
-    $cmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File ' . escapeshellarg($script);
+    
+    // Check for pwsh first, then powershell
+    $shell = 'powershell';
+    exec('where pwsh 2>NUL', $output, $code);
+    if ($code === 0) {
+        $shell = 'pwsh';
+    } else {
+        exec('where powershell 2>NUL', $output, $code);
+        if ($code !== 0) {
+            fwrite(STDERR, "Neither 'pwsh' nor 'powershell' found in PATH.\n");
+            exit(1);
+        }
+    }
+
+    $cmd = "{$shell} -NoProfile -ExecutionPolicy Bypass -File " . escapeshellarg($script);
 } elseif ($family === 'Darwin') {
     $script = $root . '/build/compile-macos.sh';
     if (!is_file($script)) {

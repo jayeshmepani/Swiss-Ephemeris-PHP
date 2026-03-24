@@ -48,9 +48,7 @@ use SwissEph\FFI\SwissEphFFI;
  */
 final class SwissEphFacade extends Facade
 {
-    /**
-     * Get registered name in service container.
-     */
+    /** Get registered name in service container. */
     protected static function getFacadeAccessor(): string
     {
         return 'swisseph';

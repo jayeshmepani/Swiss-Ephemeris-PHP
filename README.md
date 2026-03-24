@@ -43,36 +43,251 @@ composer require jayeshmepani/swiss-ephemeris-ffi
 
 You need **PHP 8.3+ with `ext-ffi`**.
 
-1. Check if FFI is available:
+#### Check if FFI is Available
+
+**Linux/macOS:**
 ```bash
 php -m | grep -i ffi
 ```
 
-2. If FFI is missing:
-   - **Linux (apt/yum)**: install the FFI package for your PHP version (example: `php8.4-ffi`).
-   - **macOS (Homebrew)**: FFI is included; ensure it is enabled in `php.ini`.
-   - **Windows**: FFI is included; enable it in `php.ini`.
-   - **Custom source build**: recompile PHP with `--with-ffi` or `--enable-ffi`.
-
-3. Enable FFI in `php.ini`:
+**Windows (PowerShell):**
+```powershell
+php -m | Select-String -Pattern "ffi"
 ```
+
+**Windows (CMD):**
+```cmd
+php -m | findstr /i "ffi"
+```
+
+#### Platform-Specific Setup
+
+<details>
+<summary><strong>🐧 Linux</strong></summary>
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install php8.3-ffi
+# or for PHP 8.4
+sudo apt install php8.4-ffi
+```
+
+**CentOS/RHEL/Fedora:**
+```bash
+sudo dnf install php-ffi
+# or
+sudo yum install php-ffi
+```
+
+**Enable FFI in php.ini:**
+```bash
+sudo nano /etc/php/8.3/cli/php.ini
+# or
+sudo nano /etc/php/8.3/apache2/php.ini  # for Apache
+```
+
+Add or ensure **BOTH** lines are present (not commented):
+```ini
+extension=ffi
 ffi.enable=1
-; or
+```
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+**Homebrew:**
+```bash
+# PHP from Homebrew includes FFI by default
+brew install php@8.3
+```
+
+**Enable FFI in php.ini:**
+```bash
+nano $(php --ini | grep "Loaded Configuration" | awk '{print $4}')
+```
+
+Add or ensure **BOTH** lines are present (not commented):
+```ini
+extension=ffi
+ffi.enable=1
+```
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+FFI is included with PHP 8.3+ for Windows.
+
+**Enable FFI in php.ini:**
+1. Locate your `php.ini` file (usually in `C:\php\php.ini`)
+2. Open it in a text editor (as Administrator)
+3. Find the lines `;extension=ffi` and `;ffi.enable=1` and remove the semicolons, or add:
+```ini
+extension=ffi
+ffi.enable=1
+```
+4. Restart your web server if using Apache/IIS
+
+**Verify installation:**
+```powershell
+php -m | Select-String -Pattern "ffi"
+```
+
+</details>
+
+<details>
+<summary><strong>🔧 Custom PHP Build</strong></summary>
+
+If you compiled PHP from source, ensure FFI was enabled:
+```bash
+php --ini | grep -i ffi
+```
+
+If missing, recompile PHP with:
+```bash
+./configure --with-ffi
+# or
+./configure --enable-ffi
+make
+sudo make install
+```
+
+**Note:** When building from source, `extension=ffi` may not be needed if FFI is compiled statically. Only `ffi.enable=1` would be required in php.ini.
+
+</details>
+
+#### Enable FFI in php.ini
+
+For all platforms, ensure **BOTH** of these settings are present in your `php.ini`:
+
+```ini
+; 1. Load the FFI extension (required on most systems)
+extension=ffi
+
+; 2. Enable FFI functionality
+ffi.enable=1
+; or for better performance with preload
 ffi.enable=preload
+; or ffi.enable=true (also works)
+```
+
+**Important:** Both lines are typically required:
+- `extension=ffi` - Loads the FFI extension module
+- `ffi.enable=1` (or `true`) - Enables FFI functionality
+
+**Verify FFI is properly configured:**
+```bash
+# Check if FFI extension is loaded
+php -m | grep -i ffi
+
+# Or create a PHP file to verify
+php -r "echo extension_loaded('ffi') ? 'FFI loaded ✓' : 'FFI not loaded ✗';"
+php -r "echo ini_get('ffi.enable') ? 'FFI enabled ✓' : 'FFI not enabled ✗';"
+```
+
+**Restart your web server** after making changes to `php.ini`:
+```bash
+# Apache
+sudo systemctl restart apache2
+# or
+sudo systemctl restart httpd
+
+# Nginx + PHP-FPM
+sudo systemctl restart php8.3-fpm
+# or
+sudo systemctl restart php-fpm
+
+# Windows (IIS/Apache)
+# Restart the web server service from Services panel or use:
+iisreset
 ```
 
 ### Prebuilt Libraries (Zero-Setup)
 
 On `composer install`, the package will attempt to download the correct prebuilt library for your OS/CPU from GitHub Releases.
 
-Asset naming (release artifacts):
-- `libswe-linux-x64.tar.gz`
-- `libswe-linux-arm64.tar.gz`
-- `libswe-macos-x64.tar.gz`
-- `libswe-macos-arm64.tar.gz`
-- `libswe-windows-x64.zip`
+#### Platform-Specific Library Assets
 
-To disable auto-download, set `SWISSEPH_SKIP_DOWNLOAD=1` and provide your own library via `SWISSEPH_LIBRARY_PATH`.
+<details>
+<summary><strong>🐧 Linux</strong></summary>
+
+**x86_64 (Intel/AMD):**
+- Asset: `libswe-linux-x64.tar.gz`
+- Library: `libswe.so`
+- Architecture: x86_64
+
+**ARM64 (Raspberry Pi, AWS Graviton, etc.):**
+- Asset: `libswe-linux-arm64.tar.gz`
+- Library: `libswe.so`
+- Architecture: aarch64
+
+**Manual Installation:**
+```bash
+# Download and extract
+tar -xzf libswe-linux-x64.tar.gz
+sudo cp libswe.so /usr/local/lib/
+sudo ldconfig
+```
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+**Intel (x86_64):**
+- Asset: `libswe-macos-x64.tar.gz`
+- Library: `libswe.dylib`
+- Architecture: x86_64
+
+**Apple Silicon (M1/M2/M3):**
+- Asset: `libswe-macos-arm64.tar.gz`
+- Library: `libswe.dylib`
+- Architecture: arm64
+
+**Manual Installation:**
+```bash
+# Download and extract
+tar -xzf libswe-macos-x64.tar.gz
+sudo cp libswe.dylib /usr/local/lib/
+# or for Homebrew PHP
+sudo cp libswe.dylib $(brew --prefix)/lib/
+```
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+**x86_64 (64-bit):**
+- Asset: `libswe-windows-x64.zip`
+- Library: `swe.dll`
+- Architecture: x86_64
+
+**Manual Installation:**
+```powershell
+# Extract the ZIP
+Expand-Archive libswe-windows-x64.zip -DestinationPath C:\php\ext\
+# Add to PATH or copy to system directory
+```
+
+**Note:** Ensure the DLL is in your PHP extension path or system PATH.
+
+</details>
+
+#### Environment Variables
+
+To customize library loading:
+
+- **`SWISSEPH_SKIP_DOWNLOAD=1`**: Disable auto-download on install
+- **`SWISSEPH_LIBRARY_PATH=/path/to/libswe.so`**: Specify custom library path
+
+Example in `.env` or shell:
+```bash
+export SWISSEPH_LIBRARY_PATH=/usr/local/lib/libswe.so
+```
 
 ### Swiss Ephemeris Version
 
@@ -100,6 +315,9 @@ composer build
 # or (OS specific)
 bash build/compile-linux.sh
 bash build/compile-macos.sh
+# Windows (PowerShell 5.1 or Core 7+)
+pwsh -File build/compile-windows.ps1
+# or
 powershell -ExecutionPolicy Bypass -File build/compile-windows.ps1
 ```
 
@@ -261,12 +479,200 @@ $jd = SwissEph::swe_julday(2000, 1, 1, 12.0, SwissEph::SE_GREG_CAL);
 
 ## Requirements
 
+### Core Requirements (All Platforms)
+
 - **PHP**: 8.3 or higher
-- **FFI Extension**: Must be enabled (`ffi.enable=preload` in php.ini)
-- **OS**: Linux/macOS/Windows. Prebuilt libs are downloaded on install when available. If not, run `composer build`.
+- **FFI Extension**: Must be loaded and enabled in php.ini:
+  ```ini
+  extension=ffi      ; Load the FFI extension
+  ffi.enable=1       ; Enable FFI (or 'true' or 'preload')
+  ```
+- **Composer**: For package installation
 - **Ephemeris Files**: Optional but recommended for high-precision calculations
 
+### Platform-Specific Requirements
+
+<details>
+<summary><strong>🐧 Linux</strong></summary>
+
+**Required Packages:**
+```bash
+# Ubuntu/Debian
+sudo apt install php8.3-cli php8.3-ffi
+
+# CentOS/RHEL/Fedora
+sudo dnf install php-cli php-ffi
+```
+
+**Configure FFI in php.ini:**
+Edit the appropriate php.ini file for your setup:
+```bash
+# CLI
+sudo nano /etc/php/8.3/cli/php.ini
+
+# Apache
+sudo nano /etc/php/8.3/apache2/php.ini
+
+# Nginx + PHP-FPM
+sudo nano /etc/php/8.3/fpm/php.ini
+```
+
+Ensure **BOTH** lines are present and uncommented:
+```ini
+extension=ffi
+ffi.enable=1
+```
+
+**Permissions:**
+- Ensure PHP has read access to the library files
+- For web servers: `www-data` or `apache` user needs read permissions
+
+**Web Server Support:**
+- **Apache**: Enable FFI in `/etc/php/8.3/apache2/php.ini`
+- **Nginx + PHP-FPM**: Enable FFI in `/etc/php/8.3/fpm/php.ini`
+
+**Restart web server:**
+```bash
+# Apache
+sudo systemctl restart apache2
+
+# Nginx + PHP-FPM
+sudo systemctl restart php8.3-fpm
+```
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+**Required:**
+- PHP 8.3+ from Homebrew (includes FFI)
+- Xcode Command Line Tools (for compilation if needed)
+
+```bash
+brew install php@8.3
+xcode-select --install
+```
+
+**Configure FFI in php.ini:**
+```bash
+# Find php.ini location
+php --ini
+
+# Edit php.ini
+nano $(php --ini | grep "Loaded Configuration" | awk '{print $4}')
+```
+
+Ensure **BOTH** lines are present and uncommented:
+```ini
+extension=ffi
+ffi.enable=1
+```
+
+**Restart web server:**
+```bash
+# Apache
+sudo apachectl restart
+
+# Nginx + PHP-FPM (Homebrew)
+brew services restart php@8.3
+```
+
+**Library Permissions:**
+- Libraries in `/usr/local/lib` should be readable by all users
+- For M-series Macs: ensure Rosetta 2 is NOT required (native arm64 libraries provided)
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+**Required:**
+- PHP 8.3+ (NTS or TS, matching your web server)
+- Visual C++ Redistributable (for DLL dependencies)
+
+**Download PHP:**
+- Official builds: [windows.php.net](https://windows.php.net/download/)
+- Ensure you download the **Thread Safe (TS)** version for Apache/IIS
+- Use **Non-Thread Safe (NTS)** for CLI or some FPM setups
+
+**Visual C++ Redistributables:**
+- Download from: [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+
+**Configure FFI in php.ini:**
+1. Locate your `php.ini` file (usually in `C:\php\php.ini`)
+2. Open it in a text editor (as Administrator)
+3. Ensure **BOTH** lines are present and uncommented:
+   ```ini
+   extension=ffi
+   ffi.enable=1
+   ```
+4. Restart your web server if using Apache/IIS
+
+**Verify FFI is loaded:**
+```powershell
+php -m | Select-String -Pattern "ffi"
+```
+
+**IIS/Apache Configuration:**
+- Ensure PHP extension directory is in PATH
+- Restart web server after enabling FFI
+
+</details>
+
+### Architecture Support
+
+| Platform | Architectures | Notes |
+|----------|---------------|-------|
+| Linux | x86_64, ARM64 | ARM64 for Raspberry Pi 4+, AWS Graviton |
+| macOS | x86_64, ARM64 | Universal support for Intel and Apple Silicon |
+| Windows | x86_64 | 64-bit only (32-bit PHP not supported) |
+
+### Troubleshooting by Platform
+
+<details>
+<summary><strong>Linux: Library Not Found</strong></summary>
+
+```bash
+# Check if library is loaded
+ldd vendor/jayeshmepani/swiss-ephemeris-ffi/libs/libswe.so
+
+# Add library path to ldconfig
+echo "/usr/local/lib" | sudo tee /etc/ld.so.conf.d/swisseph.conf
+sudo ldconfig
+```
+
+</details>
+
+<details>
+<summary><strong>macOS: Library Not Found</strong></summary>
+
+```bash
+# Check library architecture
+file /usr/local/lib/libswe.dylib
+
+# Add to library path
+export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH
+```
+
+</details>
+
+<details>
+<summary><strong>Windows: DLL Not Found</strong></summary>
+
+```powershell
+# Add PHP extension directory to PATH
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\php\ext", "Machine")
+
+# Or copy DLL to system directory
+Copy-Item swe.dll C:\Windows\System32\
+```
+
+</details>
+
 ## Development
+
+### Setup (All Platforms)
 
 ```bash
 # Clone repository
@@ -275,8 +681,89 @@ cd Swiss-Ephemeris-PHP
 
 # Install dependencies
 composer install
+```
 
-# Run tests
+### Platform-Specific Build Commands
+
+<details>
+<summary><strong>🐧 Linux</strong></summary>
+
+**Build Shared Library:**
+```bash
+# Auto-detect architecture
+composer build
+
+# Or run platform-specific script
+bash build/compile-linux.sh
+```
+
+**Run Tests:**
+```bash
+composer test
+composer quality
+```
+
+**Development Tips:**
+- Ensure `build-essential` is installed: `sudo apt install build-essential`
+- For ARM64: `sudo apt install gcc-aarch64-linux-gnu` (cross-compilation)
+
+</details>
+
+<details>
+<summary><strong>🍎 macOS</strong></summary>
+
+**Build Shared Library:**
+```bash
+# Auto-detect architecture
+composer build
+
+# Or run platform-specific script
+bash build/compile-macos.sh
+```
+
+**Run Tests:**
+```bash
+composer test
+composer quality
+```
+
+**Development Tips:**
+- Install Xcode Command Line Tools: `xcode-select --install`
+- For universal binaries: modify build script to use `-arch x86_64 -arch arm64`
+
+</details>
+
+<details>
+<summary><strong>🪟 Windows</strong></summary>
+
+**Build Shared Library:**
+```powershell
+# Run build script with Core (pwsh) or Windows PowerShell
+pwsh -File build/compile-windows.ps1
+# or
+powershell -ExecutionPolicy Bypass -File build/compile-windows.ps1
+
+# Or via Composer (automatically detects pwsh or powershell)
+composer build
+```
+
+**Run Tests:**
+```powershell
+composer test
+composer quality
+```
+
+**Development Tips:**
+- Install Visual Studio Build Tools or Visual Studio Community
+- Ensure Visual C++ Build Tools are installed
+- Run PowerShell as Administrator if needed
+
+</details>
+
+### Quick Reference
+
+```bash
+# Run all tests
 composer test
 
 # Check code quality
@@ -284,6 +771,11 @@ composer quality
 
 # Build library (if needed)
 composer build
+
+# Build for specific OS
+bash build/compile-linux.sh      # Linux
+bash build/compile-macos.sh      # macOS
+powershell -File build/compile-windows.ps1  # Windows
 ```
 
 ## 📚 Documentation

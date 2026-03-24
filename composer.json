@@ -90,7 +90,10 @@
         }
     },
     "scripts": {
-        "build": "php build/build.php",
+        "build": [
+            "Composer\\Config::disableProcessTimeout",
+            "php build/build.php"
+        ],
         "swisseph:fetch-libs": "php build/fetch-prebuilt.php",
         "post-install-cmd": [
             "@swisseph:fetch-libs"
