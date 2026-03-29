@@ -1,0 +1,154 @@
+name: Release Ephemeris Data Files
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - check_update
+
+permissions:
+  contents: write
+  pages: none
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/workflows/release-ephe-files.yml
+          sparse-checkout-cone-mode: false
+
+      - name: Get current ephe commit hash
+        id: current
+        run: |
+          if [ -f .github/workflows/.ephe-last-commit ]; then
+            echo "hash=$(cat .github/workflows/.ephe-last-commit)" >> "$GITHUB_OUTPUT"
+          else
+            echo "hash=none" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch latest ephe commit from upstream
+        id: upstream
+        run: |
+          # Get the latest commit hash for the ephe folder from upstream
+          HASH=$(curl -sL \
+            "https://api.github.com/repos/aloistr/swisseph/git/trees/main?recursive=1" | \
+            python3 -c "import sys, json; \
+            tree = json.load(sys.stdin); \
+            ephe = [x for x in tree['tree'] if x['path'].startswith('ephe/')]; \
+            if ephe: print(ephe[0]['sha'])")
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          
+          # Get latest commit date
+          DATE=$(curl -sL \
+            "https://api.github.com/repos/aloistr/swisseph/commits?path=ephe&per_page=1" | \
+            python3 -c "import sys, json; \
+            commits = json.load(sys.stdin); \
+            print(commits[0]['commit']['committer']['date'][:10]) if commits else print('')")
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+
+      - name: Check if update needed
+        id: check
+        run: |
+          CURRENT="${{ steps.current.outputs.hash }}"
+          UPSTREAM="${{ steps.upstream.outputs.hash }}"
+          
+          if [ "$CURRENT" = "none" ] || [ "$CURRENT" != "$UPSTREAM" ]; then
+            echo "update=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "update=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download ephemeris files
+        if: steps.check.outputs.update == 'true'
+        run: |
+          mkdir -p ephe-download
+          cd ephe-download
+          
+          # Download ephe folder as archive from GitHub
+          curl -sL "https://github.com/aloistr/swisseph/archive/refs/heads/master.tar.gz" | \
+            tar -xzf - --strip-components=1 "swisseph-master/ephe"
+          
+          # List files to verify
+          ls -la
+
+      - name: Create archive
+        if: steps.check.outputs.update == 'true'
+        run: |
+          cd ephe-download
+          # Create tar.gz excluding test files and README
+          tar -czf ../ephe-files.tar.gz \
+            --exclude='*.txt' \
+            --exclude='README*' \
+            --exclude='*.md' \
+            sepl*.se1 semo*.se1 seas*.se1 seasm*.se1 sepm*.se1 2>/dev/null || true
+          
+          # Also include required text files
+          cd ..
+          mkdir -p ephe-include
+          cp ephe-download/sefstars.txt ephe-include/ 2>/dev/null || true
+          cp ephe-download/seorbel.txt ephe-include/ 2>/dev/null || true
+          
+          # Create final archive with everything
+          tar -czf ephe-files.tar.gz -C ephe-download sepl*.se1 semo*.se1 seas*.se1 seasm*.se1 sepm*.se1 2>/dev/null || true
+          tar -czf ephe-files-full.tar.gz ephe-download/ 2>/dev/null || true
+          
+          ls -la *.tar.gz
+
+      - name: Delete old release asset
+        if: steps.check.outputs.update == 'true'
+        run: |
+          # Check if release exists
+          TAG="ephe-files"
+          if gh release view "$TAG" &>/dev/null; then
+            # Delete old assets
+            for asset in $(gh release view "$TAG" --json assets -q '.assets[].name' 2>/dev/null); do
+              gh release delete-asset "$TAG" "$asset" --yes 2>/dev/null || true
+            done
+            echo "Deleted old assets"
+          else
+            echo "No existing release to update"
+          fi
+
+      - name: Create or update release
+        if: steps.check.outputs.update == 'true'
+        run: |
+          TAG="ephe-files"
+          
+          # Create or update release
+          gh release create "$TAG" \
+            --title "Ephemeris Data Files" \
+            --notes "Updated ephemeris data files from upstream (aloistr/swisseph).
+            
+Date: ${{ steps.upstream.outputs.date }}
+Commit: ${{ steps.upstream.outputs.hash }}
+
+These files are licensed under AGPL-3.0. Source: https://github.com/aloistr/swisseph" \
+            --draft false \
+            ephe-files.tar.gz \
+            ephe-files-full.tar.gz
+
+      - name: Save commit hash for next run
+        if: steps.check.outputs.update == 'true'
+        run: |
+          echo "${{ steps.upstream.outputs.hash }}" > .github/workflows/.ephe-last-commit
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/.ephe-last-commit
+          git commit -m "Update ephe commit hash"
+          git push
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.check.outputs.update }}" = "true" ]; then
+            echo "✅ Ephemeris files updated!"
+            echo "Date: ${{ steps.upstream.outputs.date }}"
+            echo "Commit: ${{ steps.upstream.outputs.hash }}"
+          else
+            echo "✅ No update needed - ephemeris files are up to date"
+          fi
