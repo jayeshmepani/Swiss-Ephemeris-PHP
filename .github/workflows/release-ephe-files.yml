@@ -77,7 +77,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          rm -rf ephe-temp swisseph-temp ephe-files.tar.gz ephe-files-full.tar.gz
+          rm -rf ephe-temp swisseph-temp ephe-files.tar.gz ephe-files.zip ephe-files-full.tar.gz ephe-files-full.zip
           mkdir -p swisseph-temp ephe-temp
 
           echo "Downloading upstream repository..."
@@ -97,13 +97,15 @@ jobs:
           cd ephe-temp
 
           tar -czf ../ephe-files.tar.gz sepl*.se1 semo*.se1
+          zip -q ../ephe-files.zip sepl*.se1 semo*.se1
 
           tar -czf ../ephe-files-full.tar.gz .
+          zip -q -r ../ephe-files-full.zip .
 
           cd ..
 
           echo "Archive sizes:"
-          ls -lh *.tar.gz
+          ls -lh *.tar.gz *.zip
 
       - name: Delete old release assets and release
         if: steps.current.outputs.exists == 'true' && steps.current.outputs.current_hash != steps.upstream.outputs.hash
@@ -123,28 +125,35 @@ jobs:
         run: |
           set -euo pipefail
 
+          NOTES=$(cat << 'NOTES_EOF'
+          Updated ephemeris data files from upstream.
+
+          **Date:** ${{ steps.upstream.outputs.date }}
+          **Upstream Commit:** `${{ steps.upstream.outputs.hash }}`
+
+          These files are licensed under **AGPL-3.0**.
+          Source: https://github.com/aloistr/swisseph
+
+          > **Trust Note:** These archives are mirrored for convenience only.
+          > I do not modify the upstream ephemeris files.
+
+          ---
+          **Files included in ephe-files.tar.gz / ephe-files.zip**
+          - `sepl*.se1` - Planet ephemeris files
+          - `semo*.se1` - Moon ephemeris file
+
+          **Files included in ephe-files-full.tar.gz / ephe-files-full.zip**
+          - All files from the upstream `ephe/` folder
+          NOTES_EOF
+          )
+
           gh release create ephe-files \
             ephe-files.tar.gz \
+            ephe-files.zip \
             ephe-files-full.tar.gz \
+            ephe-files-full.zip \
             --title "Ephemeris Data Files (${{ steps.upstream.outputs.date }})" \
-            --notes "Updated ephemeris data files from upstream.
-
-**Date:** ${{ steps.upstream.outputs.date }}
-**Upstream Commit:** \`${{ steps.upstream.outputs.hash }}\`
-
-These files are licensed under **AGPL-3.0**.
-Source: https://github.com/aloistr/swisseph
-
-> **Trust Note:** These archives are mirrored for convenience only.
-> I do not modify the upstream ephemeris files.
-
----
-**Files included in ephe-files.tar.gz**
-- \`sepl*.se1\` - Planet ephemeris files
-- \`semo*.se1\` - Moon ephemeris file
-
-**Files included in ephe-files-full.tar.gz**
-- All files from the upstream \`ephe/\` folder"
+            --notes "$NOTES"
 
       - name: Summary
         run: |
