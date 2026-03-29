@@ -1,6 +1,6 @@
 # Contributing to Swiss Ephemeris PHP FFI
 
-Thank you for considering contributing to Swiss Ephemeris PHP FFI! We appreciate your interest in making this package better.
+Thank you for considering contributing to Swiss Ephemeris PHP FFI! I appreciate your interest in making my package better.
 
 ## Code of Conduct
 
@@ -32,7 +32,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 1. **Fork the repository**
 2. **Create a new branch** from `main` with a descriptive name (e.g., `feature/add-house-calculations`, `fix/ffi-pointer-issue`)
-3. **Make your changes** following our coding standards
+3. **Make your changes** following my coding standards
 4. **Write or update tests** to cover your changes
 5. **Ensure all tests pass** by running `composer test`
 6. **Run code style checks** with `composer lint`
@@ -132,9 +132,17 @@ This package aims for **100% 1:1 compatibility** with the Swiss Ephemeris C libr
 
 ### Swiss Ephemeris Licensing
 
-This repository is AGPL-licensed, and it interfaces with Swiss Ephemeris upstream, which also has its own AGPL/commercial licensing terms.
+This repository is licensed under **AGPL-3.0-or-later**.
 
-Contributions to this repository are therefore accepted under the AGPL for this project, while use or redistribution of upstream Swiss Ephemeris binaries/data must still respect the upstream license.
+> **⚠️ Commercial Use Warning**
+> 
+> If you use my package in **SaaS/web applications**, you must either:
+> - Make your source code available under AGPL-3.0, OR
+> - Purchase a commercial license from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm)
+> 
+> The Swiss Ephemeris C library upstream also has **AGPL/commercial licensing** - see [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm) for details.
+
+Contributions to my repository are accepted under AGPL-3.0, while use or redistribution of upstream Swiss Ephemeris binaries/data must respect the upstream license.
 
 ## Release Process
 

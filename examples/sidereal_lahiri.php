@@ -22,6 +22,11 @@ use SwissEph\FFI\SwissEphFFI;
 
 $sweph = new SwissEphFFI;
 
+// OPTIONAL: Set path to ephemeris files for higher precision
+// Download files from: https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/releases/tag/ephe-files
+// Or from upstream: https://github.com/aloistr/swisseph/tree/master/ephe
+// $sweph->swe_set_ephe_path(__DIR__ . '/ephe');
+
 // Calculate Julian Day for May 15, 1990, 14:30 UT
 $julianDay = $sweph->swe_julday(1990, 5, 15, 14.5, SwissEphFFI::SE_GREG_CAL);
 

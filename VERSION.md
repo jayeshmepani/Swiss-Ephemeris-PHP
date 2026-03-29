@@ -9,8 +9,9 @@ This document tracks the Swiss Ephemeris C library version used in this PHP FFI 
 | **Upstream Repository** | [aloistr/swisseph](https://github.com/aloistr/swisseph) |
 | **Latest Release Tag** | v2.10.03 (September 9, 2022) |
 | **Development Branch** | `master` (actively maintained) |
-| **Last Upstream Commit** | March 11, 2026 |
-| **Latest Commit Message** | "fixed old rounding bug in swe_split_deg()" |
+| **Last Upstream Commit** | March 24, 2026 |
+| **Latest Commit** | `768a403` |
+| **Latest Commit Message** | "this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases" |
 
 ## Version History
 

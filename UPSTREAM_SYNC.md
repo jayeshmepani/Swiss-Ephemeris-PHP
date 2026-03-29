@@ -18,9 +18,10 @@ Your PHP FFI wrapper is configured to **automatically track the latest version**
 | **Repository** | [aloistr/swisseph](https://github.com/aloistr/swisseph) |
 | **Latest Release** | v2.10.03 (September 9, 2022) |
 | **Development Branch** | `master` (actively maintained) |
-| **Last Commit** | March 11, 2026 |
-| **Latest Commit Message** | "fixed old rounding bug in swe_split_deg()" |
-| **Upstream License** | Dual: GPL-2.0-or-later OR Commercial |
+| **Last Commit** | March 24, 2026 |
+| **Latest Commit** | `768a403` |
+| **Latest Commit Message** | "this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases" |
+| **Upstream License** | AGPL-3.0-or-later OR Commercial (Swiss Ephemeris v2.10.01+) |
 
 ---
 
@@ -53,9 +54,9 @@ From https://github.com/aloistr/swisseph
    * branch            master     -> FETCH_HEAD
 
 Current Swiss Ephemeris Version Info:
-  Commit: 728f9f4
-  Date:   2026-03-11
-  Msg:    fixed old rounding bug in swe_split_deg()
+  Commit: 768a403
+  Date:   2026-03-24
+  Msg:    this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases
 
 Step 2: Compiling Swiss Ephemeris library...
 ...
@@ -69,8 +70,10 @@ Library created: /path/to/build/libswe.so
 
 | Date | Commit | Description |
 |------|--------|-------------|
+| 2026-03-24 | `768a403` | this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases |
+| 2026-03-24 | `c0ec2c8` | upgraded to DE441, remain compatible with Swiss Ephemeris 2 |
 | 2026-03-11 | `728f9f4` | Fixed old rounding bug in `swe_split_deg()` |
-| 2026-03-01 | `215129f` | `roundmin` now observed in output field `l` |
+| 2026-03-01 | `16e1806` | `roundmin` now observed in output field `l` |
 | 2026-03-01 | `a765d88` | `swe_set_ephe_path` now has `serr` parameter for debugging |
 | 2026-02-12 | `3f563e5` | Various improvements |
 
@@ -203,8 +206,18 @@ git log HEAD..origin/master --oneline
 - [x] README documents version tracking
 - [x] VERSION.md created for detailed tracking
 - [x] Users can rebuild with `composer build`
-- [x] Upstream repository is actively maintained (last commit: March 11, 2026)
+- [x] Upstream repository is actively maintained (last commit: March 24, 2026 - "this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases")
 
 ---
 
 **Conclusion**: Your Swiss Ephemeris PHP FFI wrapper is **properly configured** to stay up-to-date with the upstream Swiss Ephemeris C library. Users always get the latest bug fixes and improvements when they rebuild the library, but upstream Swiss Ephemeris licensing still applies to the C library, binaries, and ephemeris data.
+
+---
+
+> **⚠️ Commercial Use Warning**
+> 
+> The Swiss Ephemeris C library (and this PHP wrapper) is licensed under **AGPL-3.0-or-later** or **Commercial** (from Astrodienst). 
+> 
+> If you use my package in **SaaS/web applications**, you must either:
+> - Make your source code available under AGPL-3.0, OR
+> - Purchase a commercial license from [Astrodienst](https://www.astro.com/swisseph/swephprice_e.htm)

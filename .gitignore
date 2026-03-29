@@ -31,3 +31,7 @@ Thumbs.db
 /.venv
 /misc
 /node_modules
+
+.gemini-research.json
+# reports/
+swisseph

@@ -21,10 +21,22 @@ use SwissEph\FFI\SwissEphFFI;
 // Initialize Swiss Ephemeris
 $sweph = new SwissEphFFI;
 
+// OPTIONAL: Set path to ephemeris files for higher precision
+// Download files from: https://github.com/jayeshmepani/Swiss-Ephemeris-PHP/releases/tag/ephe-files
+// Or from upstream: https://github.com/aloistr/swisseph/tree/master/ephe
+// $sweph->swe_set_ephe_path(__DIR__ . '/ephe');
+
 // Get and display library version
 $versionStr = $sweph->getFFI()->new('char[256]');
 $sweph->swe_version($versionStr);
 echo 'Swiss Ephemeris Version: ' . FFI::string($versionStr) . "\n\n";
+
+// Check which ephemeris is being used
+$tfstart = $sweph->getFFI()->new('double');
+$tfend = $sweph->getFFI()->new('double');
+$denum = $sweph->getFFI()->new('int32');
+$fileData = $sweph->swe_get_current_file_data(SwissEphFFI::SE_SUN, $tfstart, $tfend, $denum);
+echo 'Ephemeris file in use: ' . ($fileData ? FFI::string($fileData) : 'Moshier (built-in)') . "\n\n";
 
 // Birth data: May 15, 1990, 14:30 UT, New York
 $birthData = [

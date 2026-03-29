@@ -12,7 +12,9 @@ use RuntimeException;
 /**
  * SwissEphFFI - Complete FFI binding for Swiss Ephemeris C Library.
  *
- * Provides 100% coverage of all functions from swephexp.h with zero abstraction.
+ * Provides 106 PHP wrapper functions - a complete 1:1 mapping of all functions
+ * from the official Swiss Ephemeris C library (swephexp.h).
+ *
  * This class loads the Swiss Ephemeris shared library (libswe.so) via PHP FFI
  * and exposes all C functions for direct astronomical calculations.
  *
@@ -21,6 +23,7 @@ use RuntimeException;
  * - No text parsing - all values are native PHP types
  * - Framework-agnostic (works with Laravel, Symfony, or plain PHP)
  * - Pre-compiled libswe.so included for Linux x64
+ * - All 106 functions from official C library (100% coverage)
  *
  * @example
  * ```php
