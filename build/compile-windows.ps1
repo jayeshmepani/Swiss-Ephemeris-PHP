@@ -33,20 +33,14 @@ if (Test-Path $srcDir) {
 
 if ($needsClone) {
     Write-Host "Step 1: Downloading Swiss Ephemeris source..."
-    Write-Host "Source: https://github.com/aloistr/swisseph (latest commit)"
-    git clone --depth 1 https://github.com/aloistr/swisseph.git swisseph_src
+    Write-Host "Source: https://github.com/aloistr/swisseph"
+    git clone https://github.com/aloistr/swisseph.git swisseph_src
     if (-Not (Test-Path $srcDir)) {
         Write-Error "Failed to clone repository. If you see 'RPC failed' or 'HTTP/2 stream' errors, try: git config --global http.version HTTP/1.1"
         exit 1
     }
 } else {
-    Write-Host "Step 1: Updating existing source..."
-    $shallowLock = Join-Path $srcDir ".git\\shallow.lock"
-    if (Test-Path $shallowLock) {
-        Remove-Item -Force $shallowLock
-    }
-    git -C $srcDir fetch --depth 1 origin master
-    git -C $srcDir reset --hard FETCH_HEAD
+    Write-Host "Step 1: Source directory exists."
 }
 
 Set-Location $srcDir

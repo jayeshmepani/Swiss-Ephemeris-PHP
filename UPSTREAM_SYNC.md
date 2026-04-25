@@ -1,6 +1,6 @@
 # Swiss Ephemeris PHP FFI - Upstream Synchronization Report
 
-**Generated**: March 23, 2026  
+**Generated**: April 25, 2026  
 **Upstream Repository**: [aloistr/swisseph](https://github.com/aloistr/swisseph)
 
 ---
@@ -16,11 +16,11 @@ Your PHP FFI wrapper is configured to **automatically track the latest version**
 | Attribute | Value |
 |-----------|-------|
 | **Repository** | [aloistr/swisseph](https://github.com/aloistr/swisseph) |
-| **Latest Release** | v2.10.03 (September 9, 2022) |
+| **Latest Release** | v2.10.3final (April 11, 2026) |
 | **Development Branch** | `master` (actively maintained) |
-| **Last Commit** | March 24, 2026 |
-| **Latest Commit** | `768a403` |
-| **Latest Commit Message** | "this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases" |
+| **Last Commit** | April 18, 2026 |
+| **Latest Commit** | `af9823f` |
+| **Latest Commit Message** | "now created with DE441" |
 | **Upstream License** | AGPL-3.0-or-later OR Commercial (Swiss Ephemeris v2.10.01+) |
 
 ---
@@ -206,7 +206,7 @@ git log HEAD..origin/master --oneline
 - [x] README documents version tracking
 - [x] VERSION.md created for detailed tracking
 - [x] Users can rebuild with `composer build`
-- [x] Upstream repository is actively maintained (last commit: March 24, 2026 - "this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases")
+- [x] Upstream repository is actively maintained (last commit: April 18, 2026 - "fixed bug in semo4200.se1")
 
 ---
 

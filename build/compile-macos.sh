@@ -35,13 +35,10 @@ fi
 
 if [ "$NEEDS_CLONE" -eq 1 ]; then
   echo "Step 1: Downloading Swiss Ephemeris source..."
-  echo "Source: https://github.com/aloistr/swisseph (latest commit)"
-  git clone --depth 1 https://github.com/aloistr/swisseph.git swisseph_src
+  echo "Source: https://github.com/aloistr/swisseph"
+  git clone https://github.com/aloistr/swisseph.git swisseph_src
 else
-  echo "Step 1: Updating existing source..."
-  rm -f "$SRC_DIR/.git/shallow.lock"
-  git -C "$SRC_DIR" fetch --depth 1 origin master
-  git -C "$SRC_DIR" reset --hard FETCH_HEAD
+  echo "Step 1: Source directory exists."
 fi
 
 cd "$SRC_DIR"

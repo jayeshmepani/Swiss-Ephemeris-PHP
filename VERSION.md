@@ -7,15 +7,24 @@ This document tracks the Swiss Ephemeris C library version used in this PHP FFI 
 | Attribute | Value |
 |-----------|-------|
 | **Upstream Repository** | [aloistr/swisseph](https://github.com/aloistr/swisseph) |
-| **Latest Release Tag** | v2.10.03 (September 9, 2022) |
+| **Latest Release Tag** | v2.10.3final (April 2026) |
 | **Development Branch** | `master` (actively maintained) |
-| **Last Upstream Commit** | March 24, 2026 |
-| **Latest Commit** | `768a403` |
-| **Latest Commit Message** | "this file, when renamed to swe_deltat.txt, updates deltaT in older pre-2.10 releases" |
+| **Last Upstream Commit** | April 18, 2026 |
+| **Latest Commit** | `af9823f` |
+| **Latest Commit Message** | "now created with DE441" |
 
 ## Version History
 
-### v2.10.03 (Current)
+### v2.10.3final (Current)
+- **Release Date**: April 11, 2026
+- **Tag**: `v2.10.3final`
+- **Commit**: `af9823f`
+- **Changes**: 
+  - Updated ephemeris data (seasnam.txt expanded significantly).
+  - Minor build and comment updates in headers.
+  - Internal version string remains `2.10.03`.
+
+### v2.10.03
 - **Release Date**: September 9, 2022
 - **Tag**: `v2.10.03`
 - **Commit**: `175e1fcb3108bcd5c0d146c803f51dcf23508012`
