@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SwissEph\Service;
 
 use Illuminate\Support\ServiceProvider;
+use Override;
 use SwissEph\FFI\SwissEphFFI;
 
 /**
@@ -33,6 +34,7 @@ final class SwissEphServiceProvider extends ServiceProvider
      * The singleton ensures only one FFI instance exists per request,
      * preventing multiple library loads and memory waste.
      */
+    #[Override]
     public function register(): void
     {
         $this->mergeConfigFrom(
@@ -71,8 +73,9 @@ final class SwissEphServiceProvider extends ServiceProvider
     /**
      * Get provided services.
      *
-     * @return array<int, class-string>
+     * @return array<int, string>
      */
+    #[Override]
     public function provides(): array
     {
         return ['swisseph', SwissEphFFI::class];

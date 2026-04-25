@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Swiss Ephemeris Configuration.
  *
@@ -8,7 +10,6 @@
  *
  * @see https://www.astro.com/swisseph/swephprg.htm Swiss Ephemeris Documentation
  */
-
 return [
     /*
     |--------------------------------------------------------------------------

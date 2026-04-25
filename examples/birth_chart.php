@@ -36,7 +36,7 @@ $tfstart = $sweph->getFFI()->new('double');
 $tfend = $sweph->getFFI()->new('double');
 $denum = $sweph->getFFI()->new('int32');
 $fileData = $sweph->swe_get_current_file_data(SwissEphFFI::SE_SUN, $tfstart, $tfend, $denum);
-echo 'Ephemeris file in use: ' . ($fileData ? FFI::string($fileData) : 'Moshier (built-in)') . "\n\n";
+echo 'Ephemeris file in use: ' . ($fileData ?? 'Moshier (built-in)') . "\n\n";
 
 // Birth data: May 15, 1990, 14:30 UT, New York
 $birthData = [
@@ -99,7 +99,8 @@ foreach ($planets as $name => $id) {
         $sign = (int) floor($xx[0] / 30);
         $degree = $xx[0] - ($sign * 30);
 
-        printf("%-12s: %3s %8.2f° (Speed: %+.4f°/day)\n",
+        printf(
+            "%-12s: %3s %8.2f° (Speed: %+.4f°/day)\n",
             $name,
             $signs[$sign],
             $degree,
@@ -136,12 +137,14 @@ if ($result !== SwissEphFFI::ERR) {
 
     echo "\n";
     // Ascendant (1st house cusp)
-    printf("Ascendant: %3s %8.2f°\n",
+    printf(
+        "Ascendant: %3s %8.2f°\n",
         $signs[(int) floor($ascmc[0] / 30)],
         $ascmc[0] - floor($ascmc[0] / 30) * 30
     );
     // Midheaven (10th house cusp)
-    printf("Midheaven (MC): %3s %8.2f°\n",
+    printf(
+        "Midheaven (MC): %3s %8.2f°\n",
         $signs[(int) floor($ascmc[1] / 30)],
         $ascmc[1] - floor($ascmc[1] / 30) * 30
     );

@@ -2,7 +2,7 @@
     "preset": "empty",
     "rules": {
         "@PSR12": true,
-        "declare_strict_types": false,
+        "declare_strict_types": true,
         "yoda_style": false,
         "new_with_parentheses": {
             "anonymous_class": false,
