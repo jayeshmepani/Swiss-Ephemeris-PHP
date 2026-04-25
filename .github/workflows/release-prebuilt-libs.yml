@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag name to upload assets to, for example v1.0.0
+        description: Tag name to upload assets to, for example v1.1.0
         required: true
         type: string
 
@@ -20,148 +20,143 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-
       - name: Install build tools
         run: sudo apt-get update && sudo apt-get install -y build-essential git
-
       - name: Compile shared library
         run: bash build/compile-linux.sh
-
-      - name: Create release archive
-        run: tar -czf build/libswe-linux-x64.tar.gz -C libs/linux-x64 libswe.so
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: libswe-linux-x64
-          path: build/libswe-linux-x64.tar.gz
-          if-no-files-found: error
+          path: libs/linux-x64/libswe.so
 
   build-linux-arm64:
     name: Build Linux arm64
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
-
       - name: Install build tools
         run: sudo apt-get update && sudo apt-get install -y build-essential git
-
       - name: Compile shared library
         run: bash build/compile-linux.sh
-
-      - name: Create release archive
-        run: tar -czf build/libswe-linux-arm64.tar.gz -C libs/linux-arm64 libswe.so
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: libswe-linux-arm64
-          path: build/libswe-linux-arm64.tar.gz
-          if-no-files-found: error
+          path: libs/linux-arm64/libswe.so
 
   build-macos-x64:
     name: Build macOS x64
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
-
       - name: Compile shared library
         run: bash build/compile-macos.sh
-
-      - name: Create release archive
-        run: tar -czf build/libswe-macos-x64.tar.gz -C libs/macos-x64 libswe.dylib
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: libswe-macos-x64
-          path: build/libswe-macos-x64.tar.gz
-          if-no-files-found: error
+          path: libs/macos-x64/libswe.dylib
 
   build-macos-arm64:
     name: Build macOS arm64
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-
       - name: Compile shared library
         run: bash build/compile-macos.sh
-
-      - name: Create release archive
-        run: tar -czf build/libswe-macos-arm64.tar.gz -C libs/macos-arm64 libswe.dylib
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: libswe-macos-arm64
-          path: build/libswe-macos-arm64.tar.gz
-          if-no-files-found: error
+          path: libs/macos-arm64/libswe.dylib
 
   build-windows-x64:
     name: Build Windows x64
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up MSYS2 with MinGW
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           update: true
-          install: >-
-            git
-            mingw-w64-x86_64-gcc
-
+          install: git mingw-w64-x86_64-gcc
       - name: Compile shared library
         shell: pwsh
         run: .\build\compile-windows.ps1
-
-      - name: Create release archive
-        shell: pwsh
-        run: Compress-Archive -Path libs\windows-x64\swe.dll -DestinationPath build\libswe-windows-x64.zip -Force
-
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: libswe-windows-x64
-          path: build/libswe-windows-x64.zip
-          if-no-files-found: error
+          path: libs/windows-x64/swe.dll
 
-  upload-release-assets:
-    name: Upload Release Assets
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
-    needs:
-      - build-linux-x64
-      - build-linux-arm64
-      - build-macos-x64
-      - build-macos-arm64
-      - build-windows-x64
+  release-and-commit:
+    name: Create GitHub Release and Commit Binaries
+    needs: [build-linux-x64, build-linux-arm64, build-macos-x64, build-macos-arm64, build-windows-x64]
     runs-on: ubuntu-latest
     steps:
-      - name: Download workflow artifacts
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download all binaries
         uses: actions/download-artifact@v4
         with:
-          path: dist
-          merge-multiple: true
+          path: libs
+          merge-multiple: false
+
+      - name: Restructure downloaded artifacts
+        run: |
+          # Move binaries into correct libs structure
+          mv libs/libswe-linux-x64/libswe.so libs/linux-x64/
+          mv libs/libswe-linux-arm64/libswe.so libs/linux-arm64/
+          mv libs/libswe-macos-x64/libswe.dylib libs/macos-x64/
+          mv libs/libswe-macos-arm64/libswe.dylib libs/macos-arm64/
+          mv libs/libswe-windows-x64/swe.dll libs/windows-x64/
+          
+          # Clean up empty artifact folders
+          rm -rf libs/libswe-*
+
+      - name: Create Release Archives
+        run: |
+          mkdir -p dist_archives
+          tar -czf dist_archives/libswe-linux-x64.tar.gz -C libs/linux-x64 libswe.so
+          tar -czf dist_archives/libswe-linux-arm64.tar.gz -C libs/linux-arm64 libswe.so
+          tar -czf dist_archives/libswe-macos-x64.tar.gz -C libs/macos-x64 libswe.dylib
+          tar -czf dist_archives/libswe-macos-arm64.tar.gz -C libs/macos-arm64 libswe.dylib
+          zip -j dist_archives/libswe-windows-x64.zip libs/windows-x64/swe.dll
+          
+          cd dist_archives
+          for file in *; do sha256sum "$file" > "${file}.sha256"; done
 
       - name: Resolve target tag
         id: target
-        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
             echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            TAG="${{ inputs.tag }}"
+            [[ $TAG != v* ]] && TAG="v$TAG"
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Attach assets to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.target.outputs.tag }}
-          files: |
-            dist/libswe-linux-x64.tar.gz
-            dist/libswe-linux-arm64.tar.gz
-            dist/libswe-macos-x64.tar.gz
-            dist/libswe-macos-arm64.tar.gz
-            dist/libswe-windows-x64.zip
+          files: dist_archives/*
           fail_on_unmatched_files: true
+
+      - name: Commit Binaries to Repository
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add libs/
+          git commit -m "chore: update prebuilt binaries for all 5 platforms [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:${{ github.ref_name }}
+          git tag ${{ steps.target.outputs.tag }}
+          git push origin ${{ steps.target.outputs.tag }}
