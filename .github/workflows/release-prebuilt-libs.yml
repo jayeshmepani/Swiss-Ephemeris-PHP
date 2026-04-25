@@ -93,7 +93,14 @@ jobs:
 
   release-and-commit:
     name: Create GitHub Release and Commit Binaries
-    needs: [build-linux-x64, build-linux-arm64, build-macos-x64, build-macos-arm64, build-windows-x64]
+    needs:
+      [
+        build-linux-x64,
+        build-linux-arm64,
+        build-macos-x64,
+        build-macos-arm64,
+        build-windows-x64,
+      ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -116,7 +123,7 @@ jobs:
           mv libs/libswe-macos-x64/libswe.dylib libs/macos-x64/
           mv libs/libswe-macos-arm64/libswe.dylib libs/macos-arm64/
           mv libs/libswe-windows-x64/swe.dll libs/windows-x64/
-          
+
           # Clean up empty artifact folders
           rm -rf libs/libswe-*
 
@@ -128,7 +135,7 @@ jobs:
           tar -czf dist_archives/libswe-macos-x64.tar.gz -C libs/macos-x64 libswe.dylib
           tar -czf dist_archives/libswe-macos-arm64.tar.gz -C libs/macos-arm64 libswe.dylib
           zip -j dist_archives/libswe-windows-x64.zip libs/windows-x64/swe.dll
-          
+
           cd dist_archives
           for file in *; do sha256sum "$file" > "${file}.sha256"; done
 
@@ -157,6 +164,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add libs/
           git commit -m "chore: update prebuilt binaries for all 5 platforms [skip ci]" || echo "No changes to commit"
+          git pull origin ${{ github.ref_name }} --rebase || git pull origin ${{ github.ref_name }}
           git push origin HEAD:${{ github.ref_name }}
-          git tag ${{ steps.target.outputs.tag }}
-          git push origin ${{ steps.target.outputs.tag }}
+          git tag ${{ steps.target.outputs.tag }} 2>/dev/null || echo "Tag already exists"
+          git push origin ${{ steps.target.outputs.tag }} 2>/dev/null || echo "Tag push skipped (already exists)"
