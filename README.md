@@ -70,6 +70,14 @@ if ($result >= 0) {
 }
 ```
 
+## Performance Audit
+
+We have conducted a rigorous side-by-side benchmark comparing this FFI implementation against the native `php-sweph` C-extension.
+
+**[View the Interactive Performance Audit →](https://jayeshmepani.github.io/Swiss-Ephemeris-PHP/benchmark/benchmark.html)**
+
+The audit demonstrates **bit-perfect accuracy** and highly competitive performance across all 106 Swiss Ephemeris functions.
+
 ## Documentation
 
 **[Read the full documentation →](https://jayeshmepani.github.io/Swiss-Ephemeris-PHP/)**
