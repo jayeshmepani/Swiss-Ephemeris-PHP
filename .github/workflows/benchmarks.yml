@@ -51,22 +51,39 @@ jobs:
             echo "Building Windows C-Extension using MinGW..."
             cd php-sweph
             mkdir -p sweph/src
+            
             # Fetch fresh swisseph source for the C-extension build
             git clone --depth 1 https://github.com/aloistr/swisseph.git swisseph_tmp
-            cp swisseph_tmp/src/*.c sweph/src/ 2>/dev/null || cp swisseph_tmp/src_c/*.c sweph/src/
-            cp swisseph_tmp/src/*.h sweph/src/ 2>/dev/null || cp swisseph_tmp/src_c/*.h sweph/src/
+            if [ -d "swisseph_tmp/src" ]; then
+                cp swisseph_tmp/src/*.c sweph/src/
+                cp swisseph_tmp/src/*.h sweph/src/
+            else
+                cp swisseph_tmp/*.c sweph/src/ 2>/dev/null || true
+                cp swisseph_tmp/*.h sweph/src/ 2>/dev/null || true
+            fi
             
             PHP_DIR=$(dirname $(which php))
             echo "PHP Directory: $PHP_DIR"
             
-            # Windows PHP headers are usually in dev/include
-            PHP_INC="$PHP_DIR/dev/include"
-            PHP_LIB_DIR="$PHP_DIR/dev"
+            # Locate PHP headers dynamically
+            PHP_INC=$(find "$PHP_DIR" -name "php.h" | head -n 1 | xargs dirname | xargs dirname)
+            if [ -z "$PHP_INC" ]; then
+              # Fallback to standard setup-php paths
+              PHP_INC="$PHP_DIR/include"
+            fi
+            echo "PHP Include Root: $PHP_INC"
+            
+            # Locate PHP library for linking
+            PHP_LIB_DIR=$(find "$PHP_DIR" -name "php8.lib" -o -name "php8ts.lib" | head -n 1 | xargs dirname)
+            PHP_LIB_NAME=$(find "$PHP_DIR" -name "php8.lib" -o -name "php8ts.lib" | head -n 1 | xargs basename | sed 's/\.lib//')
+            
+            echo "PHP Lib Dir: $PHP_LIB_DIR"
+            echo "PHP Lib Name: $PHP_LIB_NAME"
             
             echo "Compiling with GCC..."
             gcc -O2 -shared -I. -I"$PHP_INC" -I"$PHP_INC/main" -I"$PHP_INC/TSRM" -I"$PHP_INC/Zend" -I./sweph/src \
                 -DPHP_EXPORTS -DCOMPILE_DL_SWEPHP -DZEND_WIN32 -DPHP_WIN32 \
-                swephp.c sweph/src/*.c -o ../docs/benchmark/php_swephp.dll -L"$PHP_LIB_DIR" -lphp8 || echo "Compilation failed, but we tried!"
+                swephp.c sweph/src/*.c -o ../docs/benchmark/php_swephp.dll -L"$PHP_LIB_DIR" -l$PHP_LIB_NAME || echo "Compilation failed, but we tried!"
             cd ..
           else
             cd php-sweph && phpize && ./configure && make
