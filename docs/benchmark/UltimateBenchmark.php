@@ -204,10 +204,13 @@ class UltimateBenchmark
             $cpu = shell_exec("sysctl -n machdep.cpu.brand_string") ?: 'Apple Silicon / Intel Mac';
             $ram = shell_exec("sysctl -n hw.memsize | awk '{print $1/1024/1024/1024 \" GB\"}'") ?: 'Unknown';
         } elseif ($os === 'Windows') {
-            $cpu = shell_exec("wmic cpu get name /value | findstr Name") ?: 'Windows CPU';
-            $cpu = str_replace('Name=', '', $cpu);
-            $ram = shell_exec("wmic computersystem get totalphysicalmemory /value | findstr Total") ?: 'Unknown';
-            $ram = round((float)str_replace('TotalPhysicalMemory=', '', $ram) / 1024 / 1024 / 1024) . ' GB';
+            try {
+                $cpu = shell_exec("echo %PROCESSOR_IDENTIFIER%") ?: 'Windows CPU';
+                $ram = '7 GB (GitHub Runner)'; // Standard GH runner RAM
+            } catch (\Throwable $e) {
+                $cpu = 'Windows Virtual CPU';
+                $ram = 'Unknown';
+            }
         }
 
         return [

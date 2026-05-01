@@ -46,8 +46,8 @@ jobs:
           else
             php -d extension="$(pwd)/php-sweph/modules/swephp.so" docs/benchmark/UltimateBenchmark.php
           fi
-          # Rename the JSON so it doesn't conflict with other OSs
-          mv docs/benchmark/comprehensive_benchmark_stats.json docs/benchmark/${{ matrix.os }}.json
+          # The file is generated in the root, move it with a unique name
+          mv comprehensive_benchmark_stats.json docs/benchmark/${{ matrix.os }}.json
 
       - name: Upload OS Stats
         uses: actions/upload-artifact@v4
