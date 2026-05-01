@@ -77,7 +77,22 @@ jobs:
           Invoke-PhpBuildExtension -PhpVersion $phpVersion -Arch x64 -Ts $threadSafety -Args "--with-sweph=shared"
           Pop-Location
 
-          $dll = Get-ChildItem -Path php-sweph -Recurse -Filter php_swephp.dll | Select-Object -First 1
+          $artifactRoot = Join-Path (Resolve-Path php-sweph) "artifacts"
+          if (Test-Path $artifactRoot) {
+              Write-Host "Produced Windows extension artifacts:"
+              Get-ChildItem -Path $artifactRoot -Recurse | Select-Object -ExpandProperty FullName
+          }
+
+          $dll = Get-ChildItem -Path php-sweph -Recurse -Filter "php_swephp*.dll" | Select-Object -First 1
+          if (-not $dll) {
+              $zip = Get-ChildItem -Path php-sweph -Recurse -Filter "*.zip" | Select-Object -First 1
+              if ($zip) {
+                  $extractPath = Join-Path $zip.DirectoryName "extracted"
+                  Expand-Archive -Path $zip.FullName -DestinationPath $extractPath -Force
+                  $dll = Get-ChildItem -Path $extractPath -Recurse -Filter "php_swephp*.dll" | Select-Object -First 1
+              }
+          }
+
           if (-not $dll) {
               Write-Error "php_swephp.dll was not produced by the Windows extension build."
               exit 1
