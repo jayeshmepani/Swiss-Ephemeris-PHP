@@ -61,14 +61,27 @@ jobs:
             PHP_VERSION=$(php -r 'echo PHP_VERSION;')
             echo "Targeting PHP Version: $PHP_VERSION"
             curl -L "https://windows.php.net/downloads/releases/php-devel-pack-$PHP_VERSION-Win32-vs16-x64.zip" -o php-devel.zip
-            unzip -q php-devel.zip
-            DEVEL_DIR=$(ls -d php-devel-pack-*)
+            rm -rf php-devel
+            mkdir php-devel
+            unzip -q php-devel.zip -d php-devel
             
-            INC_ROOT="$PWD/$DEVEL_DIR/include"
-            LIB_ROOT="$PWD/$DEVEL_DIR/lib"
+            PHP_H=$(find "$PWD/php-devel" -type f -path "*/include/main/php.h" -print -quit)
+            if [ -z "$PHP_H" ]; then
+              echo "Could not find php.h in the extracted PHP devel pack"
+              find "$PWD/php-devel" -maxdepth 3 -type d -print
+              exit 1
+            fi
+            INC_ROOT=$(cd "$(dirname "$PHP_H")/.." && pwd)
             
             # Determine if PHP is TS or NTS to pick the right .lib
-            LIB_NAME=$(ls "$LIB_ROOT" | grep -E "php8(ts)?\.lib" | head -n 1 | sed 's/\.lib//')
+            LIB_FILE=$(find "$PWD/php-devel" -type f \( -name "php8.lib" -o -name "php8ts.lib" \) -print -quit)
+            if [ -z "$LIB_FILE" ]; then
+              echo "Could not find php8.lib or php8ts.lib in the extracted PHP devel pack"
+              find "$PWD/php-devel" -maxdepth 4 -type f -name "*.lib" -print
+              exit 1
+            fi
+            LIB_ROOT=$(dirname "$LIB_FILE")
+            LIB_NAME=$(basename "$LIB_FILE" .lib)
             echo "Linking against: $LIB_NAME"
             
             # Compile the traditional extension shim
