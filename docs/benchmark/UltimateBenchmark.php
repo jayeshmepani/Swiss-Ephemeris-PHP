@@ -218,45 +218,51 @@ class UltimateBenchmark
         ];
 
         if ($os === 'Linux') {
-            $meta['cpu'] = trim(shell_exec("lscpu | grep 'Model name' | cut -d ':' -f 2 | xargs") ?: 'Linux CPU');
-            $meta['cores'] = trim(shell_exec("lscpu | grep '^CPU(s):' | cut -d ':' -f 2 | xargs") ?: 'Unknown') . ' Threads';
-            $meta['freq'] = trim(shell_exec("lscpu | grep 'max MHz' | cut -d ':' -f 2 | xargs") ?: 'Unknown') . ' MHz';
-            $meta['l3'] = trim(shell_exec("lscpu | grep 'L3 cache' | cut -d ':' -f 2 | xargs") ?: 'N/A');
-            $meta['system'] = trim(shell_exec("cat /sys/class/dmi/id/product_name 2>/dev/null") ?: 'Generic Linux Node');
-            $flags = shell_exec("lscpu | grep 'Flags:'") ?: '';
-            $meta['instr'] = (str_contains($flags, 'avx2') ? 'AVX2' : '') . (str_contains($flags, 'bmi2') ? ', BMI2' : '') . (str_contains($flags, 'sse4_2') ? ', SSE4.2' : '');
-            $meta['ram'] = trim(shell_exec("free -h | grep 'Mem:' | awk '{print $2}'") ?: 'Unknown');
+            $meta['cpu'] = $this->commandValue("lscpu | awk -F: '/Model name/ {sub(/^[ \\t]+/, \"\", $2); print $2; exit}'") ?: 'Linux CPU';
+            $threads = $this->commandValue("lscpu | awk -F: '/^CPU\\(s\\)/ {gsub(/ /, \"\", $2); print $2; exit}'");
+            $meta['cores'] = $threads ? $threads . ' Threads' : 'Unavailable on runner';
+            $freqMhz = $this->firstNumericValue([
+                $this->commandValue("lscpu | awk -F: '/CPU max MHz/ {gsub(/ /, \"\", $2); print $2; exit}'"),
+                $this->commandValue('cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq 2>/dev/null'),
+            ]);
+            if ($freqMhz && $freqMhz > 10000) {
+                $freqMhz /= 1000;
+            }
+            $meta['freq'] = $freqMhz ? $this->formatGhz($freqMhz / 1000) : 'Unavailable on runner';
+            $meta['l3'] = $this->commandValue("lscpu | awk -F: '/L3 cache/ {sub(/^[ \\t]+/, \"\", $2); print $2; exit}'") ?: 'N/A';
+            $meta['system'] = $this->commandValue('cat /sys/class/dmi/id/product_name 2>/dev/null') ?: 'Generic Linux Node';
+            $flags = $this->commandValue("lscpu | awk -F: '/Flags/ {print $2; exit}'");
+            $meta['instr'] = $this->formatInstructionSets($flags);
+            $meta['ram'] = $this->commandValue("free -h | awk '/Mem:/ {print $2; exit}'") ?: 'Unknown';
         } elseif ($os === 'Darwin') {
-            $meta['cpu'] = trim(shell_exec("sysctl -n machdep.cpu.brand_string") ?: 'Apple Silicon');
-            $meta['cores'] = trim(shell_exec("sysctl -n hw.ncpu") ?: 'Unknown') . ' Logical Cores';
-            $meta['freq'] = round((float)trim(shell_exec("sysctl -n hw.cpufrequency") ?: '0') / 1e9, 2) . ' GHz';
-            $meta['l3'] = round((float)trim(shell_exec("sysctl -n hw.l3cachesize") ?: '0') / 1024 / 1024) . ' MB';
-            $meta['system'] = trim(shell_exec("sysctl -n hw.model") ?: 'Apple Mac');
-            $features = shell_exec("sysctl -a | grep machdep.cpu.features") ?: '';
-            $meta['instr'] = str_contains($features, 'AVX2') ? 'AVX2' : 'Neon/Apple';
-            $meta['ram'] = trim(shell_exec("sysctl -n hw.memsize | awk '{print $1/1024/1024/1024 \" GB\"}'") ?: 'Unknown');
+            $meta['cpu'] = $this->commandValue('sysctl -n machdep.cpu.brand_string 2>/dev/null') ?: 'Apple Silicon';
+            $cores = $this->commandValue('sysctl -n hw.ncpu 2>/dev/null');
+            $meta['cores'] = $cores ? $cores . ' Logical Cores' : 'Unavailable on runner';
+            $freqHz = $this->firstNumericValue([$this->commandValue('sysctl -n hw.cpufrequency 2>/dev/null')]);
+            $meta['freq'] = $freqHz ? $this->formatGhz($freqHz / 1e9) : 'Unavailable on runner';
+            $l3Bytes = $this->firstNumericValue([$this->commandValue('sysctl -n hw.l3cachesize 2>/dev/null')]);
+            $meta['l3'] = $l3Bytes ? round($l3Bytes / 1024 / 1024) . ' MB' : 'N/A';
+            $meta['system'] = $this->commandValue('sysctl -n hw.model 2>/dev/null') ?: 'Apple Mac';
+            $features = $this->commandValue('sysctl -a 2>/dev/null | grep machdep.cpu.features');
+            $meta['instr'] = php_uname('m') === 'arm64' ? 'NEON (ARM64)' : $this->formatInstructionSets($features);
+            $ramGb = $this->firstNumericValue([$this->commandValue('sysctl -n hw.memsize 2>/dev/null')]);
+            $meta['ram'] = $ramGb ? round($ramGb / 1024 / 1024 / 1024) . ' GB' : 'Unknown';
         } elseif ($os === 'Windows') {
             try {
-                $meta['cpu'] = trim(shell_exec('wmic cpu get name /value') ?: '');
-                $meta['cpu'] = trim(str_replace('Name=', '', $meta['cpu']));
-                if (empty($meta['cpu'])) $meta['cpu'] = getenv('PROCESSOR_IDENTIFIER') ?: 'Windows CPU';
-                
-                $c = trim(shell_exec("wmic cpu get NumberOfCores /value") ?: '');
-                $t = trim(shell_exec("wmic cpu get NumberOfLogicalProcessors /value") ?: '');
-                $meta['cores'] = str_replace('NumberOfCores=', '', $c) . 'C / ' . str_replace('NumberOfLogicalProcessors=', '', $t) . 'T';
-                
-                $f = trim(shell_exec("wmic cpu get MaxClockSpeed /value") ?: '');
-                $meta['freq'] = round((float)str_replace('MaxClockSpeed=', '', $f) / 1000, 2) . ' GHz';
-                
-                $l3 = trim(shell_exec("wmic cpu get L3CacheSize /value") ?: '');
-                $meta['l3'] = round((float)str_replace('L3CacheSize=', '', $l3) / 1024) . ' MB';
-                
-                $m = trim(shell_exec("wmic computersystem get model /value") ?: '');
-                $meta['system'] = trim(str_replace('Model=', '', $m));
-                
-                $meta['ram'] = shell_exec('powershell -command "(Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB"') ?: '';
-                $meta['ram'] = !empty($meta['ram']) ? round((float)$meta['ram']) . ' GB' : '7 GB (GitHub Runner)';
-                $meta['instr'] = 'AVX2, SSE4.2 (Verified)';
+                $ps = 'powershell -NoProfile -Command ';
+                $meta['cpu'] = $this->commandValue($ps . '"(Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty Name)"') ?: (getenv('PROCESSOR_IDENTIFIER') ?: 'Windows CPU');
+                $cores = $this->commandValue($ps . '"(Get-CimInstance Win32_Processor | Measure-Object -Property NumberOfCores -Sum).Sum"');
+                $threads = $this->commandValue($ps . '"(Get-CimInstance Win32_Processor | Measure-Object -Property NumberOfLogicalProcessors -Sum).Sum"');
+                $meta['cores'] = ($cores && $threads) ? $cores . 'C / ' . $threads . 'T' : 'Unavailable on runner';
+                $freqMhz = $this->firstNumericValue([$this->commandValue($ps . '"(Get-CimInstance Win32_Processor | Select-Object -First 1 -ExpandProperty MaxClockSpeed)"')]);
+                $meta['freq'] = $freqMhz ? $this->formatGhz($freqMhz / 1000) : 'Unavailable on runner';
+                $l3Kb = $this->firstNumericValue([$this->commandValue($ps . '"(Get-CimInstance Win32_Processor | Measure-Object -Property L3CacheSize -Sum).Sum"')]);
+                $meta['l3'] = $l3Kb ? round($l3Kb / 1024) . ' MB' : 'N/A';
+                $meta['system'] = $this->commandValue($ps . '"(Get-CimInstance Win32_ComputerSystem | Select-Object -First 1 -ExpandProperty Model)"') ?: 'Windows Runner';
+                $ram = $this->firstNumericValue([$this->commandValue($ps . '"(Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum"')]);
+                $meta['ram'] = $ram ? round($ram / 1024 / 1024 / 1024) . ' GB' : 'Unknown';
+                $intrinsics = $this->commandValue($ps . '"$s=@(); if ([System.Runtime.Intrinsics.X86.Avx2]::IsSupported) {$s+=\'AVX2\'}; if ([System.Runtime.Intrinsics.X86.Bmi2]::IsSupported) {$s+=\'BMI2\'}; if ([System.Runtime.Intrinsics.X86.Sse42]::IsSupported) {$s+=\'SSE4.2\'}; $s -join \', \'"');
+                $meta['instr'] = $intrinsics ?: 'Unavailable on runner';
             } catch (Throwable $e) {
                 $meta['cpu'] = 'Windows Virtual CPU';
                 $meta['ram'] = 'Unknown';
@@ -277,6 +283,47 @@ class UltimateBenchmark
             'library' => 'Swiss Ephemeris ' . $libVersion,
         ]);
     }
+
+    private function commandValue(string $command): string
+    {
+        return trim((string) @shell_exec($command));
+    }
+
+    private function firstNumericValue(array $values): ?float
+    {
+        foreach ($values as $value) {
+            if (is_numeric($value) && (float) $value > 0) {
+                return (float) $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function formatGhz(float $value): string
+    {
+        return rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.') . ' GHz';
+    }
+
+    private function formatInstructionSets(string $flags): string
+    {
+        $map = [
+            'avx2' => 'AVX2',
+            'bmi2' => 'BMI2',
+            'sse4_2' => 'SSE4.2',
+            'sse4.2' => 'SSE4.2',
+        ];
+        $found = [];
+        $flags = strtolower($flags);
+        foreach ($map as $needle => $label) {
+            if (str_contains($flags, $needle)) {
+                $found[$label] = $label;
+            }
+        }
+
+        return $found ? implode(', ', array_values($found)) : 'Unavailable on runner';
+    }
+
     private function benchBoth(string $name, array $args, int $n, int $w): void
     {
         $ffi_err = null;

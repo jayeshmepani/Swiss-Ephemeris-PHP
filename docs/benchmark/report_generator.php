@@ -1,19 +1,19 @@
 <?php
+
 declare(strict_types=1);
 
 /**
  * TRUE TRANSPARENCY MULTI-SYSTEM REPORT GENERATOR
  * This script is 100% data-driven. It has ZERO hardcoded specs or placeholders.
  */
-
 $dir = __DIR__;
 $jsonFiles = glob("$dir/*.json");
 $allData = [];
 
 foreach ($jsonFiles as $file) {
     $data = json_decode(file_get_contents($file), true);
-    if (!$data || !isset($data['system']['os'])) continue;
-    
+    if (!$data || !isset($data['system']['os'])) { continue; }
+
     $osName = $data['system']['os'];
     $key = str_contains($osName, 'Linux') ? 'Linux' : (str_contains($osName, 'Darwin') ? 'macOS' : 'Windows');
     $allData[$key] = $data;
@@ -98,11 +98,11 @@ $html = <<<'HTML'
                 <h3>Software Stack</h3>
                 <ul class="specs-list">
                     <li><span class="specs-label">Operating System</span><span class="specs-value" id="spec-os">--</span></li>
-                    <li><span class="specs-label">Total RAM</span><span class="specs-value" id="spec-ram">--</span></li>
+                    <li><span class="specs-label">Runner RAM</span><span class="specs-value" id="spec-ram">--</span></li>
                     <li><span class="specs-label">PHP Runtime</span><span class="specs-value" id="spec-php">--</span></li>
                     <li><span class="specs-label">JIT Engine</span><span class="specs-value" id="spec-jit">--</span></li>
                     <li><span class="specs-label">Library</span><span class="specs-value" id="spec-lib">--</span></li>
-                    <li><span class="specs-label">Test Date</span><span class="specs-value" id="spec-date">--</span></li>
+                    <li><span class="specs-label">Generated At</span><span class="specs-value" id="spec-date">--</span></li>
                 </ul>
             </div>
         </div>

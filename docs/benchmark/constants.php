@@ -1,349 +1,351 @@
 <?php
-if (!defined("SE_AUNIT_TO_KM")) define("SE_AUNIT_TO_KM", 149597870.7);
-if (!defined("SE_AUNIT_TO_LIGHTYEAR")) define("SE_AUNIT_TO_LIGHTYEAR", 1.5812507409819728E-5);
-if (!defined("SE_AUNIT_TO_PARSEC")) define("SE_AUNIT_TO_PARSEC", 4.848136811095274E-6);
-if (!defined("SE_JUL_CAL")) define("SE_JUL_CAL", 0);
-if (!defined("SE_GREG_CAL")) define("SE_GREG_CAL", 1);
-if (!defined("SE_ECL_NUT")) define("SE_ECL_NUT", -1);
-if (!defined("SE_SUN")) define("SE_SUN", 0);
-if (!defined("SE_MOON")) define("SE_MOON", 1);
-if (!defined("SE_MERCURY")) define("SE_MERCURY", 2);
-if (!defined("SE_VENUS")) define("SE_VENUS", 3);
-if (!defined("SE_MARS")) define("SE_MARS", 4);
-if (!defined("SE_JUPITER")) define("SE_JUPITER", 5);
-if (!defined("SE_SATURN")) define("SE_SATURN", 6);
-if (!defined("SE_URANUS")) define("SE_URANUS", 7);
-if (!defined("SE_NEPTUNE")) define("SE_NEPTUNE", 8);
-if (!defined("SE_PLUTO")) define("SE_PLUTO", 9);
-if (!defined("SE_MEAN_NODE")) define("SE_MEAN_NODE", 10);
-if (!defined("SE_TRUE_NODE")) define("SE_TRUE_NODE", 11);
-if (!defined("SE_MEAN_APOG")) define("SE_MEAN_APOG", 12);
-if (!defined("SE_OSCU_APOG")) define("SE_OSCU_APOG", 13);
-if (!defined("SE_EARTH")) define("SE_EARTH", 14);
-if (!defined("SE_CHIRON")) define("SE_CHIRON", 15);
-if (!defined("SE_PHOLUS")) define("SE_PHOLUS", 16);
-if (!defined("SE_CERES")) define("SE_CERES", 17);
-if (!defined("SE_PALLAS")) define("SE_PALLAS", 18);
-if (!defined("SE_JUNO")) define("SE_JUNO", 19);
-if (!defined("SE_VESTA")) define("SE_VESTA", 20);
-if (!defined("SE_INTP_APOG")) define("SE_INTP_APOG", 21);
-if (!defined("SE_INTP_PERG")) define("SE_INTP_PERG", 22);
-if (!defined("SE_NPLANETS")) define("SE_NPLANETS", 23);
-if (!defined("SE_PLMOON_OFFSET")) define("SE_PLMOON_OFFSET", 9000);
-if (!defined("SE_AST_OFFSET")) define("SE_AST_OFFSET", 10000);
-if (!defined("SE_VARUNA")) define("SE_VARUNA", 30000);
-if (!defined("SE_FICT_OFFSET")) define("SE_FICT_OFFSET", 40);
-if (!defined("SE_FICT_OFFSET_1")) define("SE_FICT_OFFSET_1", 39);
-if (!defined("SE_FICT_MAX")) define("SE_FICT_MAX", 999);
-if (!defined("SE_NFICT_ELEM")) define("SE_NFICT_ELEM", 15);
-if (!defined("SE_COMET_OFFSET")) define("SE_COMET_OFFSET", 1000);
-if (!defined("SE_NALL_NAT_POINTS")) define("SE_NALL_NAT_POINTS", 38);
-if (!defined("SE_CUPIDO")) define("SE_CUPIDO", 40);
-if (!defined("SE_HADES")) define("SE_HADES", 41);
-if (!defined("SE_ZEUS")) define("SE_ZEUS", 42);
-if (!defined("SE_KRONOS")) define("SE_KRONOS", 43);
-if (!defined("SE_APOLLON")) define("SE_APOLLON", 44);
-if (!defined("SE_ADMETOS")) define("SE_ADMETOS", 45);
-if (!defined("SE_VULKANUS")) define("SE_VULKANUS", 46);
-if (!defined("SE_POSEIDON")) define("SE_POSEIDON", 47);
-if (!defined("SE_ISIS")) define("SE_ISIS", 48);
-if (!defined("SE_NIBIRU")) define("SE_NIBIRU", 49);
-if (!defined("SE_HARRINGTON")) define("SE_HARRINGTON", 50);
-if (!defined("SE_NEPTUNE_LEVERRIER")) define("SE_NEPTUNE_LEVERRIER", 51);
-if (!defined("SE_NEPTUNE_ADAMS")) define("SE_NEPTUNE_ADAMS", 52);
-if (!defined("SE_PLUTO_LOWELL")) define("SE_PLUTO_LOWELL", 53);
-if (!defined("SE_PLUTO_PICKERING")) define("SE_PLUTO_PICKERING", 54);
-if (!defined("SE_VULCAN")) define("SE_VULCAN", 55);
-if (!defined("SE_WHITE_MOON")) define("SE_WHITE_MOON", 56);
-if (!defined("SE_PROSERPINA")) define("SE_PROSERPINA", 57);
-if (!defined("SE_WALDEMATH")) define("SE_WALDEMATH", 58);
-if (!defined("SE_FIXSTAR")) define("SE_FIXSTAR", -10);
-if (!defined("SE_ASC")) define("SE_ASC", 0);
-if (!defined("SE_MC")) define("SE_MC", 1);
-if (!defined("SE_ARMC")) define("SE_ARMC", 2);
-if (!defined("SE_VERTEX")) define("SE_VERTEX", 3);
-if (!defined("SE_EQUASC")) define("SE_EQUASC", 4);
-if (!defined("SE_COASC1")) define("SE_COASC1", 5);
-if (!defined("SE_COASC2")) define("SE_COASC2", 6);
-if (!defined("SE_POLASC")) define("SE_POLASC", 7);
-if (!defined("SE_NASCMC")) define("SE_NASCMC", 8);
-if (!defined("SEFLG_JPLEPH")) define("SEFLG_JPLEPH", 1);
-if (!defined("SEFLG_SWIEPH")) define("SEFLG_SWIEPH", 2);
-if (!defined("SEFLG_MOSEPH")) define("SEFLG_MOSEPH", 4);
-if (!defined("SEFLG_HELCTR")) define("SEFLG_HELCTR", 8);
-if (!defined("SEFLG_TRUEPOS")) define("SEFLG_TRUEPOS", 16);
-if (!defined("SEFLG_J2000")) define("SEFLG_J2000", 32);
-if (!defined("SEFLG_NONUT")) define("SEFLG_NONUT", 64);
-if (!defined("SEFLG_SPEED3")) define("SEFLG_SPEED3", 128);
-if (!defined("SEFLG_SPEED")) define("SEFLG_SPEED", 256);
-if (!defined("SEFLG_NOGDEFL")) define("SEFLG_NOGDEFL", 512);
-if (!defined("SEFLG_NOABERR")) define("SEFLG_NOABERR", 1024);
-if (!defined("SEFLG_ASTROMETRIC")) define("SEFLG_ASTROMETRIC", 1536);
-if (!defined("SEFLG_EQUATORIAL")) define("SEFLG_EQUATORIAL", 2048);
-if (!defined("SEFLG_XYZ")) define("SEFLG_XYZ", 4096);
-if (!defined("SEFLG_RADIANS")) define("SEFLG_RADIANS", 8192);
-if (!defined("SEFLG_BARYCTR")) define("SEFLG_BARYCTR", 16384);
-if (!defined("SEFLG_TOPOCTR")) define("SEFLG_TOPOCTR", 32768);
-if (!defined("SEFLG_ORBEL_AA")) define("SEFLG_ORBEL_AA", 32768);
-if (!defined("SEFLG_TROPICAL")) define("SEFLG_TROPICAL", 0);
-if (!defined("SEFLG_SIDEREAL")) define("SEFLG_SIDEREAL", 65536);
-if (!defined("SEFLG_ICRS")) define("SEFLG_ICRS", 131072);
-if (!defined("SEFLG_DPSIDEPS_1980")) define("SEFLG_DPSIDEPS_1980", 262144);
-if (!defined("SEFLG_JPLHOR")) define("SEFLG_JPLHOR", 262144);
-if (!defined("SEFLG_JPLHOR_APPROX")) define("SEFLG_JPLHOR_APPROX", 524288);
-if (!defined("SEFLG_CENTER_BODY")) define("SEFLG_CENTER_BODY", 1048576);
-if (!defined("SEFLG_TEST_PLMOON")) define("SEFLG_TEST_PLMOON", 2228280);
-if (!defined("SE_SIDBITS")) define("SE_SIDBITS", 256);
-if (!defined("SE_SIDBIT_ECL_T0")) define("SE_SIDBIT_ECL_T0", 256);
-if (!defined("SE_SIDBIT_SSY_PLANE")) define("SE_SIDBIT_SSY_PLANE", 512);
-if (!defined("SE_SIDBIT_USER_UT")) define("SE_SIDBIT_USER_UT", 1024);
-if (!defined("SE_SIDBIT_ECL_DATE")) define("SE_SIDBIT_ECL_DATE", 2048);
-if (!defined("SE_SIDBIT_NO_PREC_OFFSET")) define("SE_SIDBIT_NO_PREC_OFFSET", 4096);
-if (!defined("SE_SIDBIT_PREC_ORIG")) define("SE_SIDBIT_PREC_ORIG", 8192);
-if (!defined("SE_SIDM_FAGAN_BRADLEY")) define("SE_SIDM_FAGAN_BRADLEY", 0);
-if (!defined("SE_SIDM_LAHIRI")) define("SE_SIDM_LAHIRI", 1);
-if (!defined("SE_SIDM_DELUCE")) define("SE_SIDM_DELUCE", 2);
-if (!defined("SE_SIDM_RAMAN")) define("SE_SIDM_RAMAN", 3);
-if (!defined("SE_SIDM_USHASHASHI")) define("SE_SIDM_USHASHASHI", 4);
-if (!defined("SE_SIDM_KRISHNAMURTI")) define("SE_SIDM_KRISHNAMURTI", 5);
-if (!defined("SE_SIDM_DJWHAL_KHUL")) define("SE_SIDM_DJWHAL_KHUL", 6);
-if (!defined("SE_SIDM_YUKTESHWAR")) define("SE_SIDM_YUKTESHWAR", 7);
-if (!defined("SE_SIDM_JN_BHASIN")) define("SE_SIDM_JN_BHASIN", 8);
-if (!defined("SE_SIDM_BABYL_KUGLER1")) define("SE_SIDM_BABYL_KUGLER1", 9);
-if (!defined("SE_SIDM_BABYL_KUGLER2")) define("SE_SIDM_BABYL_KUGLER2", 10);
-if (!defined("SE_SIDM_BABYL_KUGLER3")) define("SE_SIDM_BABYL_KUGLER3", 11);
-if (!defined("SE_SIDM_BABYL_HUBER")) define("SE_SIDM_BABYL_HUBER", 12);
-if (!defined("SE_SIDM_BABYL_ETPSC")) define("SE_SIDM_BABYL_ETPSC", 13);
-if (!defined("SE_SIDM_ALDEBARAN_15TAU")) define("SE_SIDM_ALDEBARAN_15TAU", 14);
-if (!defined("SE_SIDM_HIPPARCHOS")) define("SE_SIDM_HIPPARCHOS", 15);
-if (!defined("SE_SIDM_SASSANIAN")) define("SE_SIDM_SASSANIAN", 16);
-if (!defined("SE_SIDM_GALCENT_0SAG")) define("SE_SIDM_GALCENT_0SAG", 17);
-if (!defined("SE_SIDM_J2000")) define("SE_SIDM_J2000", 18);
-if (!defined("SE_SIDM_J1900")) define("SE_SIDM_J1900", 19);
-if (!defined("SE_SIDM_B1950")) define("SE_SIDM_B1950", 20);
-if (!defined("SE_SIDM_SURYASIDDHANTA")) define("SE_SIDM_SURYASIDDHANTA", 21);
-if (!defined("SE_SIDM_SURYASIDDHANTA_MSUN")) define("SE_SIDM_SURYASIDDHANTA_MSUN", 22);
-if (!defined("SE_SIDM_ARYABHATA")) define("SE_SIDM_ARYABHATA", 23);
-if (!defined("SE_SIDM_ARYABHATA_MSUN")) define("SE_SIDM_ARYABHATA_MSUN", 24);
-if (!defined("SE_SIDM_SS_REVATI")) define("SE_SIDM_SS_REVATI", 25);
-if (!defined("SE_SIDM_SS_CITRA")) define("SE_SIDM_SS_CITRA", 26);
-if (!defined("SE_SIDM_TRUE_CITRA")) define("SE_SIDM_TRUE_CITRA", 27);
-if (!defined("SE_SIDM_TRUE_REVATI")) define("SE_SIDM_TRUE_REVATI", 28);
-if (!defined("SE_SIDM_TRUE_PUSHYA")) define("SE_SIDM_TRUE_PUSHYA", 29);
-if (!defined("SE_SIDM_GALCENT_RGILBRAND")) define("SE_SIDM_GALCENT_RGILBRAND", 30);
-if (!defined("SE_SIDM_GALEQU_IAU1958")) define("SE_SIDM_GALEQU_IAU1958", 31);
-if (!defined("SE_SIDM_GALEQU_TRUE")) define("SE_SIDM_GALEQU_TRUE", 32);
-if (!defined("SE_SIDM_GALEQU_MULA")) define("SE_SIDM_GALEQU_MULA", 33);
-if (!defined("SE_SIDM_GALALIGN_MARDYKS")) define("SE_SIDM_GALALIGN_MARDYKS", 34);
-if (!defined("SE_SIDM_TRUE_MULA")) define("SE_SIDM_TRUE_MULA", 35);
-if (!defined("SE_SIDM_GALCENT_MULA_WILHELM")) define("SE_SIDM_GALCENT_MULA_WILHELM", 36);
-if (!defined("SE_SIDM_ARYABHATA_522")) define("SE_SIDM_ARYABHATA_522", 37);
-if (!defined("SE_SIDM_BABYL_BRITTON")) define("SE_SIDM_BABYL_BRITTON", 38);
-if (!defined("SE_SIDM_TRUE_SHEORAN")) define("SE_SIDM_TRUE_SHEORAN", 39);
-if (!defined("SE_SIDM_GALCENT_COCHRANE")) define("SE_SIDM_GALCENT_COCHRANE", 40);
-if (!defined("SE_SIDM_GALEQU_FIORENZA")) define("SE_SIDM_GALEQU_FIORENZA", 41);
-if (!defined("SE_SIDM_VALENS_MOON")) define("SE_SIDM_VALENS_MOON", 42);
-if (!defined("SE_SIDM_LAHIRI_1940")) define("SE_SIDM_LAHIRI_1940", 43);
-if (!defined("SE_SIDM_LAHIRI_VP285")) define("SE_SIDM_LAHIRI_VP285", 44);
-if (!defined("SE_SIDM_KRISHNAMURTI_VP291")) define("SE_SIDM_KRISHNAMURTI_VP291", 45);
-if (!defined("SE_SIDM_LAHIRI_ICRC")) define("SE_SIDM_LAHIRI_ICRC", 46);
-if (!defined("SE_SIDM_USER")) define("SE_SIDM_USER", 255);
-if (!defined("SE_NSIDM_PREDEF")) define("SE_NSIDM_PREDEF", 47);
-if (!defined("SE_NODBIT_MEAN")) define("SE_NODBIT_MEAN", 1);
-if (!defined("SE_NODBIT_OSCU")) define("SE_NODBIT_OSCU", 2);
-if (!defined("SE_NODBIT_OSCU_BAR")) define("SE_NODBIT_OSCU_BAR", 4);
-if (!defined("SE_NODBIT_FOPOINT")) define("SE_NODBIT_FOPOINT", 256);
-if (!defined("SEFLG_DEFAULTEPH")) define("SEFLG_DEFAULTEPH", 2);
-if (!defined("SE_MAX_STNAME")) define("SE_MAX_STNAME", 256);
-if (!defined("SE_ECL_CENTRAL")) define("SE_ECL_CENTRAL", 1);
-if (!defined("SE_ECL_NONCENTRAL")) define("SE_ECL_NONCENTRAL", 2);
-if (!defined("SE_ECL_TOTAL")) define("SE_ECL_TOTAL", 4);
-if (!defined("SE_ECL_ANNULAR")) define("SE_ECL_ANNULAR", 8);
-if (!defined("SE_ECL_PARTIAL")) define("SE_ECL_PARTIAL", 16);
-if (!defined("SE_ECL_ANNULAR_TOTAL")) define("SE_ECL_ANNULAR_TOTAL", 32);
-if (!defined("SE_ECL_HYBRID")) define("SE_ECL_HYBRID", 32);
-if (!defined("SE_ECL_PENUMBRAL")) define("SE_ECL_PENUMBRAL", 64);
-if (!defined("SE_ECL_ALLTYPES_SOLAR")) define("SE_ECL_ALLTYPES_SOLAR", 63);
-if (!defined("SE_ECL_ALLTYPES_LUNAR")) define("SE_ECL_ALLTYPES_LUNAR", 84);
-if (!defined("SE_ECL_VISIBLE")) define("SE_ECL_VISIBLE", 128);
-if (!defined("SE_ECL_MAX_VISIBLE")) define("SE_ECL_MAX_VISIBLE", 256);
-if (!defined("SE_ECL_1ST_VISIBLE")) define("SE_ECL_1ST_VISIBLE", 512);
-if (!defined("SE_ECL_PARTBEG_VISIBLE")) define("SE_ECL_PARTBEG_VISIBLE", 512);
-if (!defined("SE_ECL_2ND_VISIBLE")) define("SE_ECL_2ND_VISIBLE", 1024);
-if (!defined("SE_ECL_TOTBEG_VISIBLE")) define("SE_ECL_TOTBEG_VISIBLE", 1024);
-if (!defined("SE_ECL_3RD_VISIBLE")) define("SE_ECL_3RD_VISIBLE", 2048);
-if (!defined("SE_ECL_TOTEND_VISIBLE")) define("SE_ECL_TOTEND_VISIBLE", 2048);
-if (!defined("SE_ECL_4TH_VISIBLE")) define("SE_ECL_4TH_VISIBLE", 4096);
-if (!defined("SE_ECL_PARTEND_VISIBLE")) define("SE_ECL_PARTEND_VISIBLE", 4096);
-if (!defined("SE_ECL_PENUMBBEG_VISIBLE")) define("SE_ECL_PENUMBBEG_VISIBLE", 8192);
-if (!defined("SE_ECL_PENUMBEND_VISIBLE")) define("SE_ECL_PENUMBEND_VISIBLE", 16384);
-if (!defined("SE_ECL_OCC_BEG_DAYLIGHT")) define("SE_ECL_OCC_BEG_DAYLIGHT", 8192);
-if (!defined("SE_ECL_OCC_END_DAYLIGHT")) define("SE_ECL_OCC_END_DAYLIGHT", 16384);
-if (!defined("SE_ECL_ONE_TRY")) define("SE_ECL_ONE_TRY", 32768);
-if (!defined("SE_CALC_RISE")) define("SE_CALC_RISE", 1);
-if (!defined("SE_CALC_SET")) define("SE_CALC_SET", 2);
-if (!defined("SE_CALC_MTRANSIT")) define("SE_CALC_MTRANSIT", 4);
-if (!defined("SE_CALC_ITRANSIT")) define("SE_CALC_ITRANSIT", 8);
-if (!defined("SE_BIT_DISC_CENTER")) define("SE_BIT_DISC_CENTER", 256);
-if (!defined("SE_BIT_DISC_BOTTOM")) define("SE_BIT_DISC_BOTTOM", 8192);
-if (!defined("SE_BIT_GEOCTR_NO_ECL_LAT")) define("SE_BIT_GEOCTR_NO_ECL_LAT", 128);
-if (!defined("SE_BIT_NO_REFRACTION")) define("SE_BIT_NO_REFRACTION", 512);
-if (!defined("SE_BIT_CIVIL_TWILIGHT")) define("SE_BIT_CIVIL_TWILIGHT", 1024);
-if (!defined("SE_BIT_NAUTIC_TWILIGHT")) define("SE_BIT_NAUTIC_TWILIGHT", 2048);
-if (!defined("SE_BIT_ASTRO_TWILIGHT")) define("SE_BIT_ASTRO_TWILIGHT", 4096);
-if (!defined("SE_BIT_FIXED_DISC_SIZE")) define("SE_BIT_FIXED_DISC_SIZE", 16384);
-if (!defined("SE_BIT_FORCE_SLOW_METHOD")) define("SE_BIT_FORCE_SLOW_METHOD", 32768);
-if (!defined("SE_BIT_HINDU_RISING")) define("SE_BIT_HINDU_RISING", 896);
-if (!defined("SE_ECL2HOR")) define("SE_ECL2HOR", 0);
-if (!defined("SE_EQU2HOR")) define("SE_EQU2HOR", 1);
-if (!defined("SE_HOR2ECL")) define("SE_HOR2ECL", 0);
-if (!defined("SE_HOR2EQU")) define("SE_HOR2EQU", 1);
-if (!defined("SE_TRUE_TO_APP")) define("SE_TRUE_TO_APP", 0);
-if (!defined("SE_APP_TO_TRUE")) define("SE_APP_TO_TRUE", 1);
-if (!defined("SE_DE_NUMBER")) define("SE_DE_NUMBER", 431);
-if (!defined("SE_FNAME_DE200")) define("SE_FNAME_DE200", 'de200.eph');
-if (!defined("SE_FNAME_DE403")) define("SE_FNAME_DE403", 'de403.eph');
-if (!defined("SE_FNAME_DE404")) define("SE_FNAME_DE404", 'de404.eph');
-if (!defined("SE_FNAME_DE405")) define("SE_FNAME_DE405", 'de405.eph');
-if (!defined("SE_FNAME_DE406")) define("SE_FNAME_DE406", 'de406.eph');
-if (!defined("SE_FNAME_DE431")) define("SE_FNAME_DE431", 'de431.eph');
-if (!defined("SE_FNAME_DFT")) define("SE_FNAME_DFT", 'de431.eph');
-if (!defined("SE_FNAME_DFT2")) define("SE_FNAME_DFT2", 'de406.eph');
-if (!defined("SE_STARFILE_OLD")) define("SE_STARFILE_OLD", 'fixstars.cat');
-if (!defined("SE_STARFILE")) define("SE_STARFILE", 'sefstars.txt');
-if (!defined("SE_ASTNAMFILE")) define("SE_ASTNAMFILE", 'seasnam.txt');
-if (!defined("SE_FICTFILE")) define("SE_FICTFILE", 'seorbel.txt');
-if (!defined("SE_EPHE_PATH")) define("SE_EPHE_PATH", '.:/users/ephe2/:/users/ephe/');
-if (!defined("SE_SPLIT_DEG_ROUND_SEC")) define("SE_SPLIT_DEG_ROUND_SEC", 1);
-if (!defined("SE_SPLIT_DEG_ROUND_MIN")) define("SE_SPLIT_DEG_ROUND_MIN", 2);
-if (!defined("SE_SPLIT_DEG_ROUND_DEG")) define("SE_SPLIT_DEG_ROUND_DEG", 4);
-if (!defined("SE_SPLIT_DEG_ZODIACAL")) define("SE_SPLIT_DEG_ZODIACAL", 8);
-if (!defined("SE_SPLIT_DEG_NAKSHATRA")) define("SE_SPLIT_DEG_NAKSHATRA", 1024);
-if (!defined("SE_SPLIT_DEG_KEEP_SIGN")) define("SE_SPLIT_DEG_KEEP_SIGN", 16);
-if (!defined("SE_SPLIT_DEG_KEEP_DEG")) define("SE_SPLIT_DEG_KEEP_DEG", 32);
-if (!defined("SE_HELIACAL_RISING")) define("SE_HELIACAL_RISING", 1);
-if (!defined("SE_HELIACAL_SETTING")) define("SE_HELIACAL_SETTING", 2);
-if (!defined("SE_MORNING_FIRST")) define("SE_MORNING_FIRST", 1);
-if (!defined("SE_EVENING_LAST")) define("SE_EVENING_LAST", 2);
-if (!defined("SE_EVENING_FIRST")) define("SE_EVENING_FIRST", 3);
-if (!defined("SE_MORNING_LAST")) define("SE_MORNING_LAST", 4);
-if (!defined("SE_ACRONYCHAL_RISING")) define("SE_ACRONYCHAL_RISING", 5);
-if (!defined("SE_ACRONYCHAL_SETTING")) define("SE_ACRONYCHAL_SETTING", 6);
-if (!defined("SE_COSMICAL_SETTING")) define("SE_COSMICAL_SETTING", 6);
-if (!defined("SE_HELFLAG_LONG_SEARCH")) define("SE_HELFLAG_LONG_SEARCH", 128);
-if (!defined("SE_HELFLAG_HIGH_PRECISION")) define("SE_HELFLAG_HIGH_PRECISION", 256);
-if (!defined("SE_HELFLAG_OPTICAL_PARAMS")) define("SE_HELFLAG_OPTICAL_PARAMS", 512);
-if (!defined("SE_HELFLAG_NO_DETAILS")) define("SE_HELFLAG_NO_DETAILS", 1024);
-if (!defined("SE_HELFLAG_SEARCH_1_PERIOD")) define("SE_HELFLAG_SEARCH_1_PERIOD", 2048);
-if (!defined("SE_HELFLAG_VISLIM_DARK")) define("SE_HELFLAG_VISLIM_DARK", 4096);
-if (!defined("SE_HELFLAG_VISLIM_NOMOON")) define("SE_HELFLAG_VISLIM_NOMOON", 8192);
-if (!defined("SE_HELFLAG_VISLIM_PHOTOPIC")) define("SE_HELFLAG_VISLIM_PHOTOPIC", 16384);
-if (!defined("SE_HELFLAG_VISLIM_SCOTOPIC")) define("SE_HELFLAG_VISLIM_SCOTOPIC", 32768);
-if (!defined("SE_HELFLAG_AV")) define("SE_HELFLAG_AV", 65536);
-if (!defined("SE_HELFLAG_AVKIND_VR")) define("SE_HELFLAG_AVKIND_VR", 65536);
-if (!defined("SE_HELFLAG_AVKIND_PTO")) define("SE_HELFLAG_AVKIND_PTO", 131072);
-if (!defined("SE_HELFLAG_AVKIND_MIN7")) define("SE_HELFLAG_AVKIND_MIN7", 262144);
-if (!defined("SE_HELFLAG_AVKIND_MIN9")) define("SE_HELFLAG_AVKIND_MIN9", 524288);
-if (!defined("SE_HELFLAG_AVKIND")) define("SE_HELFLAG_AVKIND", 983040);
-if (!defined("SE_HELIACAL_LONG_SEARCH")) define("SE_HELIACAL_LONG_SEARCH", 128);
-if (!defined("SE_HELIACAL_HIGH_PRECISION")) define("SE_HELIACAL_HIGH_PRECISION", 256);
-if (!defined("SE_HELIACAL_OPTICAL_PARAMS")) define("SE_HELIACAL_OPTICAL_PARAMS", 512);
-if (!defined("SE_HELIACAL_NO_DETAILS")) define("SE_HELIACAL_NO_DETAILS", 1024);
-if (!defined("SE_HELIACAL_SEARCH_1_PERIOD")) define("SE_HELIACAL_SEARCH_1_PERIOD", 2048);
-if (!defined("SE_HELIACAL_VISLIM_DARK")) define("SE_HELIACAL_VISLIM_DARK", 4096);
-if (!defined("SE_HELIACAL_VISLIM_NOMOON")) define("SE_HELIACAL_VISLIM_NOMOON", 8192);
-if (!defined("SE_HELIACAL_VISLIM_PHOTOPIC")) define("SE_HELIACAL_VISLIM_PHOTOPIC", 16384);
-if (!defined("SE_HELIACAL_AVKIND_VR")) define("SE_HELIACAL_AVKIND_VR", 32768);
-if (!defined("SE_HELIACAL_AVKIND_PTO")) define("SE_HELIACAL_AVKIND_PTO", 65536);
-if (!defined("SE_HELIACAL_AVKIND_MIN7")) define("SE_HELIACAL_AVKIND_MIN7", 131072);
-if (!defined("SE_HELIACAL_AVKIND_MIN9")) define("SE_HELIACAL_AVKIND_MIN9", 262144);
-if (!defined("SE_HELIACAL_AVKIND")) define("SE_HELIACAL_AVKIND", 983040);
-if (!defined("SE_PHOTOPIC_FLAG")) define("SE_PHOTOPIC_FLAG", 0);
-if (!defined("SE_SCOTOPIC_FLAG")) define("SE_SCOTOPIC_FLAG", 1);
-if (!defined("SE_MIXEDOPIC_FLAG")) define("SE_MIXEDOPIC_FLAG", 2);
-if (!defined("SE_TIDAL_DE200")) define("SE_TIDAL_DE200", -23.8946);
-if (!defined("SE_TIDAL_DE403")) define("SE_TIDAL_DE403", -25.58);
-if (!defined("SE_TIDAL_DE404")) define("SE_TIDAL_DE404", -25.58);
-if (!defined("SE_TIDAL_DE405")) define("SE_TIDAL_DE405", -25.826);
-if (!defined("SE_TIDAL_DE406")) define("SE_TIDAL_DE406", -25.826);
-if (!defined("SE_TIDAL_DE421")) define("SE_TIDAL_DE421", -25.85);
-if (!defined("SE_TIDAL_DE422")) define("SE_TIDAL_DE422", -25.85);
-if (!defined("SE_TIDAL_DE430")) define("SE_TIDAL_DE430", -25.82);
-if (!defined("SE_TIDAL_DE431")) define("SE_TIDAL_DE431", -25.8);
-if (!defined("SE_TIDAL_DE441")) define("SE_TIDAL_DE441", -25.936);
-if (!defined("SE_TIDAL_26")) define("SE_TIDAL_26", -26.0);
-if (!defined("SE_TIDAL_STEPHENSON_2016")) define("SE_TIDAL_STEPHENSON_2016", -25.85);
-if (!defined("SE_TIDAL_DEFAULT")) define("SE_TIDAL_DEFAULT", -25.8);
-if (!defined("SE_TIDAL_AUTOMATIC")) define("SE_TIDAL_AUTOMATIC", 999999);
-if (!defined("SE_TIDAL_MOSEPH")) define("SE_TIDAL_MOSEPH", -25.58);
-if (!defined("SE_TIDAL_SWIEPH")) define("SE_TIDAL_SWIEPH", -25.8);
-if (!defined("SE_TIDAL_JPLEPH")) define("SE_TIDAL_JPLEPH", -25.8);
-if (!defined("SE_DELTAT_AUTOMATIC")) define("SE_DELTAT_AUTOMATIC", -1.0E-10);
-if (!defined("SE_MODEL_DELTAT")) define("SE_MODEL_DELTAT", 0);
-if (!defined("SE_MODEL_PREC_LONGTERM")) define("SE_MODEL_PREC_LONGTERM", 1);
-if (!defined("SE_MODEL_PREC_SHORTTERM")) define("SE_MODEL_PREC_SHORTTERM", 2);
-if (!defined("SE_MODEL_NUT")) define("SE_MODEL_NUT", 3);
-if (!defined("SE_MODEL_BIAS")) define("SE_MODEL_BIAS", 4);
-if (!defined("SE_MODEL_JPLHOR_MODE")) define("SE_MODEL_JPLHOR_MODE", 5);
-if (!defined("SE_MODEL_JPLHORA_MODE")) define("SE_MODEL_JPLHORA_MODE", 6);
-if (!defined("SE_MODEL_SIDT")) define("SE_MODEL_SIDT", 7);
-if (!defined("SEMOD_NPREC")) define("SEMOD_NPREC", 11);
-if (!defined("SEMOD_PREC_IAU_1976")) define("SEMOD_PREC_IAU_1976", 1);
-if (!defined("SEMOD_PREC_LASKAR_1986")) define("SEMOD_PREC_LASKAR_1986", 2);
-if (!defined("SEMOD_PREC_WILL_EPS_LASK")) define("SEMOD_PREC_WILL_EPS_LASK", 3);
-if (!defined("SEMOD_PREC_WILLIAMS_1994")) define("SEMOD_PREC_WILLIAMS_1994", 4);
-if (!defined("SEMOD_PREC_SIMON_1994")) define("SEMOD_PREC_SIMON_1994", 5);
-if (!defined("SEMOD_PREC_IAU_2000")) define("SEMOD_PREC_IAU_2000", 6);
-if (!defined("SEMOD_PREC_BRETAGNON_2003")) define("SEMOD_PREC_BRETAGNON_2003", 7);
-if (!defined("SEMOD_PREC_IAU_2006")) define("SEMOD_PREC_IAU_2006", 8);
-if (!defined("SEMOD_PREC_VONDRAK_2011")) define("SEMOD_PREC_VONDRAK_2011", 9);
-if (!defined("SEMOD_PREC_OWEN_1990")) define("SEMOD_PREC_OWEN_1990", 10);
-if (!defined("SEMOD_PREC_NEWCOMB")) define("SEMOD_PREC_NEWCOMB", 11);
-if (!defined("SEMOD_PREC_DEFAULT")) define("SEMOD_PREC_DEFAULT", 9);
-if (!defined("SEMOD_PREC_DEFAULT_SHORT")) define("SEMOD_PREC_DEFAULT_SHORT", 9);
-if (!defined("SEMOD_NNUT")) define("SEMOD_NNUT", 5);
-if (!defined("SEMOD_NUT_IAU_1980")) define("SEMOD_NUT_IAU_1980", 1);
-if (!defined("SEMOD_NUT_IAU_CORR_1987")) define("SEMOD_NUT_IAU_CORR_1987", 2);
-if (!defined("SEMOD_NUT_IAU_2000A")) define("SEMOD_NUT_IAU_2000A", 3);
-if (!defined("SEMOD_NUT_IAU_2000B")) define("SEMOD_NUT_IAU_2000B", 4);
-if (!defined("SEMOD_NUT_WOOLARD")) define("SEMOD_NUT_WOOLARD", 5);
-if (!defined("SEMOD_NUT_DEFAULT")) define("SEMOD_NUT_DEFAULT", 4);
-if (!defined("SEMOD_NSIDT")) define("SEMOD_NSIDT", 4);
-if (!defined("SEMOD_SIDT_IAU_1976")) define("SEMOD_SIDT_IAU_1976", 1);
-if (!defined("SEMOD_SIDT_IAU_2006")) define("SEMOD_SIDT_IAU_2006", 2);
-if (!defined("SEMOD_SIDT_IERS_CONV_2010")) define("SEMOD_SIDT_IERS_CONV_2010", 3);
-if (!defined("SEMOD_SIDT_LONGTERM")) define("SEMOD_SIDT_LONGTERM", 4);
-if (!defined("SEMOD_SIDT_DEFAULT")) define("SEMOD_SIDT_DEFAULT", 4);
-if (!defined("SEMOD_NBIAS")) define("SEMOD_NBIAS", 3);
-if (!defined("SEMOD_BIAS_NONE")) define("SEMOD_BIAS_NONE", 1);
-if (!defined("SEMOD_BIAS_IAU2000")) define("SEMOD_BIAS_IAU2000", 2);
-if (!defined("SEMOD_BIAS_IAU2006")) define("SEMOD_BIAS_IAU2006", 3);
-if (!defined("SEMOD_BIAS_DEFAULT")) define("SEMOD_BIAS_DEFAULT", 3);
-if (!defined("SEMOD_NJPLHOR")) define("SEMOD_NJPLHOR", 2);
-if (!defined("SEMOD_JPLHOR_LONG_AGREEMENT")) define("SEMOD_JPLHOR_LONG_AGREEMENT", 1);
-if (!defined("SEMOD_JPLHOR_DEFAULT")) define("SEMOD_JPLHOR_DEFAULT", 1);
-if (!defined("SEMOD_NJPLHORA")) define("SEMOD_NJPLHORA", 3);
-if (!defined("SEMOD_JPLHORA_1")) define("SEMOD_JPLHORA_1", 1);
-if (!defined("SEMOD_JPLHORA_2")) define("SEMOD_JPLHORA_2", 2);
-if (!defined("SEMOD_JPLHORA_3")) define("SEMOD_JPLHORA_3", 3);
-if (!defined("SEMOD_JPLHORA_DEFAULT")) define("SEMOD_JPLHORA_DEFAULT", 3);
-if (!defined("SEMOD_NDELTAT")) define("SEMOD_NDELTAT", 5);
-if (!defined("SEMOD_DELTAT_STEPHENSON_MORRISON_1984")) define("SEMOD_DELTAT_STEPHENSON_MORRISON_1984", 1);
-if (!defined("SEMOD_DELTAT_STEPHENSON_1997")) define("SEMOD_DELTAT_STEPHENSON_1997", 2);
-if (!defined("SEMOD_DELTAT_STEPHENSON_MORRISON_2004")) define("SEMOD_DELTAT_STEPHENSON_MORRISON_2004", 3);
-if (!defined("SEMOD_DELTAT_ESPENAK_MEEUS_2006")) define("SEMOD_DELTAT_ESPENAK_MEEUS_2006", 4);
-if (!defined("SEMOD_DELTAT_STEPHENSON_ETC_2016")) define("SEMOD_DELTAT_STEPHENSON_ETC_2016", 5);
-if (!defined("SEMOD_DELTAT_DEFAULT")) define("SEMOD_DELTAT_DEFAULT", 5);
-if (!defined("SE_HOUSES_PLACIDUS")) define("SE_HOUSES_PLACIDUS", 'P');
-if (!defined("SE_HOUSES_KOCH")) define("SE_HOUSES_KOCH", 'K');
-if (!defined("SE_HOUSES_PORPHYRIUS")) define("SE_HOUSES_PORPHYRIUS", 'O');
-if (!defined("SE_HOUSES_REGIOMONTANUS")) define("SE_HOUSES_REGIOMONTANUS", 'R');
-if (!defined("SE_HOUSES_CAMPANO")) define("SE_HOUSES_CAMPANO", 'C');
-if (!defined("SE_HOUSES_EQUAL")) define("SE_HOUSES_EQUAL", 'E');
-if (!defined("SE_HOUSES_EQUAL_VEHIC")) define("SE_HOUSES_EQUAL_VEHIC", 'V');
-if (!defined("SE_HOUSES_POLICH_PAGE")) define("SE_HOUSES_POLICH_PAGE", 'T');
-if (!defined("SE_HOUSES_ALCABITUS")) define("SE_HOUSES_ALCABITUS", 'B');
-if (!defined("SE_HOUSES_MORINUS")) define("SE_HOUSES_MORINUS", 'M');
-if (!defined("SE_HOUSES_KRUSINSKI")) define("SE_HOUSES_KRUSINSKI", 'U');
-if (!defined("OK")) define("OK", 0);
-if (!defined("ERR")) define("ERR", -1);
+
+declare(strict_types=1);
+if (!defined('SE_AUNIT_TO_KM')) { define('SE_AUNIT_TO_KM', 149597870.7); }
+if (!defined('SE_AUNIT_TO_LIGHTYEAR')) { define('SE_AUNIT_TO_LIGHTYEAR', 1.5812507409819728E-5); }
+if (!defined('SE_AUNIT_TO_PARSEC')) { define('SE_AUNIT_TO_PARSEC', 4.848136811095274E-6); }
+if (!defined('SE_JUL_CAL')) { define('SE_JUL_CAL', 0); }
+if (!defined('SE_GREG_CAL')) { define('SE_GREG_CAL', 1); }
+if (!defined('SE_ECL_NUT')) { define('SE_ECL_NUT', -1); }
+if (!defined('SE_SUN')) { define('SE_SUN', 0); }
+if (!defined('SE_MOON')) { define('SE_MOON', 1); }
+if (!defined('SE_MERCURY')) { define('SE_MERCURY', 2); }
+if (!defined('SE_VENUS')) { define('SE_VENUS', 3); }
+if (!defined('SE_MARS')) { define('SE_MARS', 4); }
+if (!defined('SE_JUPITER')) { define('SE_JUPITER', 5); }
+if (!defined('SE_SATURN')) { define('SE_SATURN', 6); }
+if (!defined('SE_URANUS')) { define('SE_URANUS', 7); }
+if (!defined('SE_NEPTUNE')) { define('SE_NEPTUNE', 8); }
+if (!defined('SE_PLUTO')) { define('SE_PLUTO', 9); }
+if (!defined('SE_MEAN_NODE')) { define('SE_MEAN_NODE', 10); }
+if (!defined('SE_TRUE_NODE')) { define('SE_TRUE_NODE', 11); }
+if (!defined('SE_MEAN_APOG')) { define('SE_MEAN_APOG', 12); }
+if (!defined('SE_OSCU_APOG')) { define('SE_OSCU_APOG', 13); }
+if (!defined('SE_EARTH')) { define('SE_EARTH', 14); }
+if (!defined('SE_CHIRON')) { define('SE_CHIRON', 15); }
+if (!defined('SE_PHOLUS')) { define('SE_PHOLUS', 16); }
+if (!defined('SE_CERES')) { define('SE_CERES', 17); }
+if (!defined('SE_PALLAS')) { define('SE_PALLAS', 18); }
+if (!defined('SE_JUNO')) { define('SE_JUNO', 19); }
+if (!defined('SE_VESTA')) { define('SE_VESTA', 20); }
+if (!defined('SE_INTP_APOG')) { define('SE_INTP_APOG', 21); }
+if (!defined('SE_INTP_PERG')) { define('SE_INTP_PERG', 22); }
+if (!defined('SE_NPLANETS')) { define('SE_NPLANETS', 23); }
+if (!defined('SE_PLMOON_OFFSET')) { define('SE_PLMOON_OFFSET', 9000); }
+if (!defined('SE_AST_OFFSET')) { define('SE_AST_OFFSET', 10000); }
+if (!defined('SE_VARUNA')) { define('SE_VARUNA', 30000); }
+if (!defined('SE_FICT_OFFSET')) { define('SE_FICT_OFFSET', 40); }
+if (!defined('SE_FICT_OFFSET_1')) { define('SE_FICT_OFFSET_1', 39); }
+if (!defined('SE_FICT_MAX')) { define('SE_FICT_MAX', 999); }
+if (!defined('SE_NFICT_ELEM')) { define('SE_NFICT_ELEM', 15); }
+if (!defined('SE_COMET_OFFSET')) { define('SE_COMET_OFFSET', 1000); }
+if (!defined('SE_NALL_NAT_POINTS')) { define('SE_NALL_NAT_POINTS', 38); }
+if (!defined('SE_CUPIDO')) { define('SE_CUPIDO', 40); }
+if (!defined('SE_HADES')) { define('SE_HADES', 41); }
+if (!defined('SE_ZEUS')) { define('SE_ZEUS', 42); }
+if (!defined('SE_KRONOS')) { define('SE_KRONOS', 43); }
+if (!defined('SE_APOLLON')) { define('SE_APOLLON', 44); }
+if (!defined('SE_ADMETOS')) { define('SE_ADMETOS', 45); }
+if (!defined('SE_VULKANUS')) { define('SE_VULKANUS', 46); }
+if (!defined('SE_POSEIDON')) { define('SE_POSEIDON', 47); }
+if (!defined('SE_ISIS')) { define('SE_ISIS', 48); }
+if (!defined('SE_NIBIRU')) { define('SE_NIBIRU', 49); }
+if (!defined('SE_HARRINGTON')) { define('SE_HARRINGTON', 50); }
+if (!defined('SE_NEPTUNE_LEVERRIER')) { define('SE_NEPTUNE_LEVERRIER', 51); }
+if (!defined('SE_NEPTUNE_ADAMS')) { define('SE_NEPTUNE_ADAMS', 52); }
+if (!defined('SE_PLUTO_LOWELL')) { define('SE_PLUTO_LOWELL', 53); }
+if (!defined('SE_PLUTO_PICKERING')) { define('SE_PLUTO_PICKERING', 54); }
+if (!defined('SE_VULCAN')) { define('SE_VULCAN', 55); }
+if (!defined('SE_WHITE_MOON')) { define('SE_WHITE_MOON', 56); }
+if (!defined('SE_PROSERPINA')) { define('SE_PROSERPINA', 57); }
+if (!defined('SE_WALDEMATH')) { define('SE_WALDEMATH', 58); }
+if (!defined('SE_FIXSTAR')) { define('SE_FIXSTAR', -10); }
+if (!defined('SE_ASC')) { define('SE_ASC', 0); }
+if (!defined('SE_MC')) { define('SE_MC', 1); }
+if (!defined('SE_ARMC')) { define('SE_ARMC', 2); }
+if (!defined('SE_VERTEX')) { define('SE_VERTEX', 3); }
+if (!defined('SE_EQUASC')) { define('SE_EQUASC', 4); }
+if (!defined('SE_COASC1')) { define('SE_COASC1', 5); }
+if (!defined('SE_COASC2')) { define('SE_COASC2', 6); }
+if (!defined('SE_POLASC')) { define('SE_POLASC', 7); }
+if (!defined('SE_NASCMC')) { define('SE_NASCMC', 8); }
+if (!defined('SEFLG_JPLEPH')) { define('SEFLG_JPLEPH', 1); }
+if (!defined('SEFLG_SWIEPH')) { define('SEFLG_SWIEPH', 2); }
+if (!defined('SEFLG_MOSEPH')) { define('SEFLG_MOSEPH', 4); }
+if (!defined('SEFLG_HELCTR')) { define('SEFLG_HELCTR', 8); }
+if (!defined('SEFLG_TRUEPOS')) { define('SEFLG_TRUEPOS', 16); }
+if (!defined('SEFLG_J2000')) { define('SEFLG_J2000', 32); }
+if (!defined('SEFLG_NONUT')) { define('SEFLG_NONUT', 64); }
+if (!defined('SEFLG_SPEED3')) { define('SEFLG_SPEED3', 128); }
+if (!defined('SEFLG_SPEED')) { define('SEFLG_SPEED', 256); }
+if (!defined('SEFLG_NOGDEFL')) { define('SEFLG_NOGDEFL', 512); }
+if (!defined('SEFLG_NOABERR')) { define('SEFLG_NOABERR', 1024); }
+if (!defined('SEFLG_ASTROMETRIC')) { define('SEFLG_ASTROMETRIC', 1536); }
+if (!defined('SEFLG_EQUATORIAL')) { define('SEFLG_EQUATORIAL', 2048); }
+if (!defined('SEFLG_XYZ')) { define('SEFLG_XYZ', 4096); }
+if (!defined('SEFLG_RADIANS')) { define('SEFLG_RADIANS', 8192); }
+if (!defined('SEFLG_BARYCTR')) { define('SEFLG_BARYCTR', 16384); }
+if (!defined('SEFLG_TOPOCTR')) { define('SEFLG_TOPOCTR', 32768); }
+if (!defined('SEFLG_ORBEL_AA')) { define('SEFLG_ORBEL_AA', 32768); }
+if (!defined('SEFLG_TROPICAL')) { define('SEFLG_TROPICAL', 0); }
+if (!defined('SEFLG_SIDEREAL')) { define('SEFLG_SIDEREAL', 65536); }
+if (!defined('SEFLG_ICRS')) { define('SEFLG_ICRS', 131072); }
+if (!defined('SEFLG_DPSIDEPS_1980')) { define('SEFLG_DPSIDEPS_1980', 262144); }
+if (!defined('SEFLG_JPLHOR')) { define('SEFLG_JPLHOR', 262144); }
+if (!defined('SEFLG_JPLHOR_APPROX')) { define('SEFLG_JPLHOR_APPROX', 524288); }
+if (!defined('SEFLG_CENTER_BODY')) { define('SEFLG_CENTER_BODY', 1048576); }
+if (!defined('SEFLG_TEST_PLMOON')) { define('SEFLG_TEST_PLMOON', 2228280); }
+if (!defined('SE_SIDBITS')) { define('SE_SIDBITS', 256); }
+if (!defined('SE_SIDBIT_ECL_T0')) { define('SE_SIDBIT_ECL_T0', 256); }
+if (!defined('SE_SIDBIT_SSY_PLANE')) { define('SE_SIDBIT_SSY_PLANE', 512); }
+if (!defined('SE_SIDBIT_USER_UT')) { define('SE_SIDBIT_USER_UT', 1024); }
+if (!defined('SE_SIDBIT_ECL_DATE')) { define('SE_SIDBIT_ECL_DATE', 2048); }
+if (!defined('SE_SIDBIT_NO_PREC_OFFSET')) { define('SE_SIDBIT_NO_PREC_OFFSET', 4096); }
+if (!defined('SE_SIDBIT_PREC_ORIG')) { define('SE_SIDBIT_PREC_ORIG', 8192); }
+if (!defined('SE_SIDM_FAGAN_BRADLEY')) { define('SE_SIDM_FAGAN_BRADLEY', 0); }
+if (!defined('SE_SIDM_LAHIRI')) { define('SE_SIDM_LAHIRI', 1); }
+if (!defined('SE_SIDM_DELUCE')) { define('SE_SIDM_DELUCE', 2); }
+if (!defined('SE_SIDM_RAMAN')) { define('SE_SIDM_RAMAN', 3); }
+if (!defined('SE_SIDM_USHASHASHI')) { define('SE_SIDM_USHASHASHI', 4); }
+if (!defined('SE_SIDM_KRISHNAMURTI')) { define('SE_SIDM_KRISHNAMURTI', 5); }
+if (!defined('SE_SIDM_DJWHAL_KHUL')) { define('SE_SIDM_DJWHAL_KHUL', 6); }
+if (!defined('SE_SIDM_YUKTESHWAR')) { define('SE_SIDM_YUKTESHWAR', 7); }
+if (!defined('SE_SIDM_JN_BHASIN')) { define('SE_SIDM_JN_BHASIN', 8); }
+if (!defined('SE_SIDM_BABYL_KUGLER1')) { define('SE_SIDM_BABYL_KUGLER1', 9); }
+if (!defined('SE_SIDM_BABYL_KUGLER2')) { define('SE_SIDM_BABYL_KUGLER2', 10); }
+if (!defined('SE_SIDM_BABYL_KUGLER3')) { define('SE_SIDM_BABYL_KUGLER3', 11); }
+if (!defined('SE_SIDM_BABYL_HUBER')) { define('SE_SIDM_BABYL_HUBER', 12); }
+if (!defined('SE_SIDM_BABYL_ETPSC')) { define('SE_SIDM_BABYL_ETPSC', 13); }
+if (!defined('SE_SIDM_ALDEBARAN_15TAU')) { define('SE_SIDM_ALDEBARAN_15TAU', 14); }
+if (!defined('SE_SIDM_HIPPARCHOS')) { define('SE_SIDM_HIPPARCHOS', 15); }
+if (!defined('SE_SIDM_SASSANIAN')) { define('SE_SIDM_SASSANIAN', 16); }
+if (!defined('SE_SIDM_GALCENT_0SAG')) { define('SE_SIDM_GALCENT_0SAG', 17); }
+if (!defined('SE_SIDM_J2000')) { define('SE_SIDM_J2000', 18); }
+if (!defined('SE_SIDM_J1900')) { define('SE_SIDM_J1900', 19); }
+if (!defined('SE_SIDM_B1950')) { define('SE_SIDM_B1950', 20); }
+if (!defined('SE_SIDM_SURYASIDDHANTA')) { define('SE_SIDM_SURYASIDDHANTA', 21); }
+if (!defined('SE_SIDM_SURYASIDDHANTA_MSUN')) { define('SE_SIDM_SURYASIDDHANTA_MSUN', 22); }
+if (!defined('SE_SIDM_ARYABHATA')) { define('SE_SIDM_ARYABHATA', 23); }
+if (!defined('SE_SIDM_ARYABHATA_MSUN')) { define('SE_SIDM_ARYABHATA_MSUN', 24); }
+if (!defined('SE_SIDM_SS_REVATI')) { define('SE_SIDM_SS_REVATI', 25); }
+if (!defined('SE_SIDM_SS_CITRA')) { define('SE_SIDM_SS_CITRA', 26); }
+if (!defined('SE_SIDM_TRUE_CITRA')) { define('SE_SIDM_TRUE_CITRA', 27); }
+if (!defined('SE_SIDM_TRUE_REVATI')) { define('SE_SIDM_TRUE_REVATI', 28); }
+if (!defined('SE_SIDM_TRUE_PUSHYA')) { define('SE_SIDM_TRUE_PUSHYA', 29); }
+if (!defined('SE_SIDM_GALCENT_RGILBRAND')) { define('SE_SIDM_GALCENT_RGILBRAND', 30); }
+if (!defined('SE_SIDM_GALEQU_IAU1958')) { define('SE_SIDM_GALEQU_IAU1958', 31); }
+if (!defined('SE_SIDM_GALEQU_TRUE')) { define('SE_SIDM_GALEQU_TRUE', 32); }
+if (!defined('SE_SIDM_GALEQU_MULA')) { define('SE_SIDM_GALEQU_MULA', 33); }
+if (!defined('SE_SIDM_GALALIGN_MARDYKS')) { define('SE_SIDM_GALALIGN_MARDYKS', 34); }
+if (!defined('SE_SIDM_TRUE_MULA')) { define('SE_SIDM_TRUE_MULA', 35); }
+if (!defined('SE_SIDM_GALCENT_MULA_WILHELM')) { define('SE_SIDM_GALCENT_MULA_WILHELM', 36); }
+if (!defined('SE_SIDM_ARYABHATA_522')) { define('SE_SIDM_ARYABHATA_522', 37); }
+if (!defined('SE_SIDM_BABYL_BRITTON')) { define('SE_SIDM_BABYL_BRITTON', 38); }
+if (!defined('SE_SIDM_TRUE_SHEORAN')) { define('SE_SIDM_TRUE_SHEORAN', 39); }
+if (!defined('SE_SIDM_GALCENT_COCHRANE')) { define('SE_SIDM_GALCENT_COCHRANE', 40); }
+if (!defined('SE_SIDM_GALEQU_FIORENZA')) { define('SE_SIDM_GALEQU_FIORENZA', 41); }
+if (!defined('SE_SIDM_VALENS_MOON')) { define('SE_SIDM_VALENS_MOON', 42); }
+if (!defined('SE_SIDM_LAHIRI_1940')) { define('SE_SIDM_LAHIRI_1940', 43); }
+if (!defined('SE_SIDM_LAHIRI_VP285')) { define('SE_SIDM_LAHIRI_VP285', 44); }
+if (!defined('SE_SIDM_KRISHNAMURTI_VP291')) { define('SE_SIDM_KRISHNAMURTI_VP291', 45); }
+if (!defined('SE_SIDM_LAHIRI_ICRC')) { define('SE_SIDM_LAHIRI_ICRC', 46); }
+if (!defined('SE_SIDM_USER')) { define('SE_SIDM_USER', 255); }
+if (!defined('SE_NSIDM_PREDEF')) { define('SE_NSIDM_PREDEF', 47); }
+if (!defined('SE_NODBIT_MEAN')) { define('SE_NODBIT_MEAN', 1); }
+if (!defined('SE_NODBIT_OSCU')) { define('SE_NODBIT_OSCU', 2); }
+if (!defined('SE_NODBIT_OSCU_BAR')) { define('SE_NODBIT_OSCU_BAR', 4); }
+if (!defined('SE_NODBIT_FOPOINT')) { define('SE_NODBIT_FOPOINT', 256); }
+if (!defined('SEFLG_DEFAULTEPH')) { define('SEFLG_DEFAULTEPH', 2); }
+if (!defined('SE_MAX_STNAME')) { define('SE_MAX_STNAME', 256); }
+if (!defined('SE_ECL_CENTRAL')) { define('SE_ECL_CENTRAL', 1); }
+if (!defined('SE_ECL_NONCENTRAL')) { define('SE_ECL_NONCENTRAL', 2); }
+if (!defined('SE_ECL_TOTAL')) { define('SE_ECL_TOTAL', 4); }
+if (!defined('SE_ECL_ANNULAR')) { define('SE_ECL_ANNULAR', 8); }
+if (!defined('SE_ECL_PARTIAL')) { define('SE_ECL_PARTIAL', 16); }
+if (!defined('SE_ECL_ANNULAR_TOTAL')) { define('SE_ECL_ANNULAR_TOTAL', 32); }
+if (!defined('SE_ECL_HYBRID')) { define('SE_ECL_HYBRID', 32); }
+if (!defined('SE_ECL_PENUMBRAL')) { define('SE_ECL_PENUMBRAL', 64); }
+if (!defined('SE_ECL_ALLTYPES_SOLAR')) { define('SE_ECL_ALLTYPES_SOLAR', 63); }
+if (!defined('SE_ECL_ALLTYPES_LUNAR')) { define('SE_ECL_ALLTYPES_LUNAR', 84); }
+if (!defined('SE_ECL_VISIBLE')) { define('SE_ECL_VISIBLE', 128); }
+if (!defined('SE_ECL_MAX_VISIBLE')) { define('SE_ECL_MAX_VISIBLE', 256); }
+if (!defined('SE_ECL_1ST_VISIBLE')) { define('SE_ECL_1ST_VISIBLE', 512); }
+if (!defined('SE_ECL_PARTBEG_VISIBLE')) { define('SE_ECL_PARTBEG_VISIBLE', 512); }
+if (!defined('SE_ECL_2ND_VISIBLE')) { define('SE_ECL_2ND_VISIBLE', 1024); }
+if (!defined('SE_ECL_TOTBEG_VISIBLE')) { define('SE_ECL_TOTBEG_VISIBLE', 1024); }
+if (!defined('SE_ECL_3RD_VISIBLE')) { define('SE_ECL_3RD_VISIBLE', 2048); }
+if (!defined('SE_ECL_TOTEND_VISIBLE')) { define('SE_ECL_TOTEND_VISIBLE', 2048); }
+if (!defined('SE_ECL_4TH_VISIBLE')) { define('SE_ECL_4TH_VISIBLE', 4096); }
+if (!defined('SE_ECL_PARTEND_VISIBLE')) { define('SE_ECL_PARTEND_VISIBLE', 4096); }
+if (!defined('SE_ECL_PENUMBBEG_VISIBLE')) { define('SE_ECL_PENUMBBEG_VISIBLE', 8192); }
+if (!defined('SE_ECL_PENUMBEND_VISIBLE')) { define('SE_ECL_PENUMBEND_VISIBLE', 16384); }
+if (!defined('SE_ECL_OCC_BEG_DAYLIGHT')) { define('SE_ECL_OCC_BEG_DAYLIGHT', 8192); }
+if (!defined('SE_ECL_OCC_END_DAYLIGHT')) { define('SE_ECL_OCC_END_DAYLIGHT', 16384); }
+if (!defined('SE_ECL_ONE_TRY')) { define('SE_ECL_ONE_TRY', 32768); }
+if (!defined('SE_CALC_RISE')) { define('SE_CALC_RISE', 1); }
+if (!defined('SE_CALC_SET')) { define('SE_CALC_SET', 2); }
+if (!defined('SE_CALC_MTRANSIT')) { define('SE_CALC_MTRANSIT', 4); }
+if (!defined('SE_CALC_ITRANSIT')) { define('SE_CALC_ITRANSIT', 8); }
+if (!defined('SE_BIT_DISC_CENTER')) { define('SE_BIT_DISC_CENTER', 256); }
+if (!defined('SE_BIT_DISC_BOTTOM')) { define('SE_BIT_DISC_BOTTOM', 8192); }
+if (!defined('SE_BIT_GEOCTR_NO_ECL_LAT')) { define('SE_BIT_GEOCTR_NO_ECL_LAT', 128); }
+if (!defined('SE_BIT_NO_REFRACTION')) { define('SE_BIT_NO_REFRACTION', 512); }
+if (!defined('SE_BIT_CIVIL_TWILIGHT')) { define('SE_BIT_CIVIL_TWILIGHT', 1024); }
+if (!defined('SE_BIT_NAUTIC_TWILIGHT')) { define('SE_BIT_NAUTIC_TWILIGHT', 2048); }
+if (!defined('SE_BIT_ASTRO_TWILIGHT')) { define('SE_BIT_ASTRO_TWILIGHT', 4096); }
+if (!defined('SE_BIT_FIXED_DISC_SIZE')) { define('SE_BIT_FIXED_DISC_SIZE', 16384); }
+if (!defined('SE_BIT_FORCE_SLOW_METHOD')) { define('SE_BIT_FORCE_SLOW_METHOD', 32768); }
+if (!defined('SE_BIT_HINDU_RISING')) { define('SE_BIT_HINDU_RISING', 896); }
+if (!defined('SE_ECL2HOR')) { define('SE_ECL2HOR', 0); }
+if (!defined('SE_EQU2HOR')) { define('SE_EQU2HOR', 1); }
+if (!defined('SE_HOR2ECL')) { define('SE_HOR2ECL', 0); }
+if (!defined('SE_HOR2EQU')) { define('SE_HOR2EQU', 1); }
+if (!defined('SE_TRUE_TO_APP')) { define('SE_TRUE_TO_APP', 0); }
+if (!defined('SE_APP_TO_TRUE')) { define('SE_APP_TO_TRUE', 1); }
+if (!defined('SE_DE_NUMBER')) { define('SE_DE_NUMBER', 431); }
+if (!defined('SE_FNAME_DE200')) { define('SE_FNAME_DE200', 'de200.eph'); }
+if (!defined('SE_FNAME_DE403')) { define('SE_FNAME_DE403', 'de403.eph'); }
+if (!defined('SE_FNAME_DE404')) { define('SE_FNAME_DE404', 'de404.eph'); }
+if (!defined('SE_FNAME_DE405')) { define('SE_FNAME_DE405', 'de405.eph'); }
+if (!defined('SE_FNAME_DE406')) { define('SE_FNAME_DE406', 'de406.eph'); }
+if (!defined('SE_FNAME_DE431')) { define('SE_FNAME_DE431', 'de431.eph'); }
+if (!defined('SE_FNAME_DFT')) { define('SE_FNAME_DFT', 'de431.eph'); }
+if (!defined('SE_FNAME_DFT2')) { define('SE_FNAME_DFT2', 'de406.eph'); }
+if (!defined('SE_STARFILE_OLD')) { define('SE_STARFILE_OLD', 'fixstars.cat'); }
+if (!defined('SE_STARFILE')) { define('SE_STARFILE', 'sefstars.txt'); }
+if (!defined('SE_ASTNAMFILE')) { define('SE_ASTNAMFILE', 'seasnam.txt'); }
+if (!defined('SE_FICTFILE')) { define('SE_FICTFILE', 'seorbel.txt'); }
+if (!defined('SE_EPHE_PATH')) { define('SE_EPHE_PATH', '.:/users/ephe2/:/users/ephe/'); }
+if (!defined('SE_SPLIT_DEG_ROUND_SEC')) { define('SE_SPLIT_DEG_ROUND_SEC', 1); }
+if (!defined('SE_SPLIT_DEG_ROUND_MIN')) { define('SE_SPLIT_DEG_ROUND_MIN', 2); }
+if (!defined('SE_SPLIT_DEG_ROUND_DEG')) { define('SE_SPLIT_DEG_ROUND_DEG', 4); }
+if (!defined('SE_SPLIT_DEG_ZODIACAL')) { define('SE_SPLIT_DEG_ZODIACAL', 8); }
+if (!defined('SE_SPLIT_DEG_NAKSHATRA')) { define('SE_SPLIT_DEG_NAKSHATRA', 1024); }
+if (!defined('SE_SPLIT_DEG_KEEP_SIGN')) { define('SE_SPLIT_DEG_KEEP_SIGN', 16); }
+if (!defined('SE_SPLIT_DEG_KEEP_DEG')) { define('SE_SPLIT_DEG_KEEP_DEG', 32); }
+if (!defined('SE_HELIACAL_RISING')) { define('SE_HELIACAL_RISING', 1); }
+if (!defined('SE_HELIACAL_SETTING')) { define('SE_HELIACAL_SETTING', 2); }
+if (!defined('SE_MORNING_FIRST')) { define('SE_MORNING_FIRST', 1); }
+if (!defined('SE_EVENING_LAST')) { define('SE_EVENING_LAST', 2); }
+if (!defined('SE_EVENING_FIRST')) { define('SE_EVENING_FIRST', 3); }
+if (!defined('SE_MORNING_LAST')) { define('SE_MORNING_LAST', 4); }
+if (!defined('SE_ACRONYCHAL_RISING')) { define('SE_ACRONYCHAL_RISING', 5); }
+if (!defined('SE_ACRONYCHAL_SETTING')) { define('SE_ACRONYCHAL_SETTING', 6); }
+if (!defined('SE_COSMICAL_SETTING')) { define('SE_COSMICAL_SETTING', 6); }
+if (!defined('SE_HELFLAG_LONG_SEARCH')) { define('SE_HELFLAG_LONG_SEARCH', 128); }
+if (!defined('SE_HELFLAG_HIGH_PRECISION')) { define('SE_HELFLAG_HIGH_PRECISION', 256); }
+if (!defined('SE_HELFLAG_OPTICAL_PARAMS')) { define('SE_HELFLAG_OPTICAL_PARAMS', 512); }
+if (!defined('SE_HELFLAG_NO_DETAILS')) { define('SE_HELFLAG_NO_DETAILS', 1024); }
+if (!defined('SE_HELFLAG_SEARCH_1_PERIOD')) { define('SE_HELFLAG_SEARCH_1_PERIOD', 2048); }
+if (!defined('SE_HELFLAG_VISLIM_DARK')) { define('SE_HELFLAG_VISLIM_DARK', 4096); }
+if (!defined('SE_HELFLAG_VISLIM_NOMOON')) { define('SE_HELFLAG_VISLIM_NOMOON', 8192); }
+if (!defined('SE_HELFLAG_VISLIM_PHOTOPIC')) { define('SE_HELFLAG_VISLIM_PHOTOPIC', 16384); }
+if (!defined('SE_HELFLAG_VISLIM_SCOTOPIC')) { define('SE_HELFLAG_VISLIM_SCOTOPIC', 32768); }
+if (!defined('SE_HELFLAG_AV')) { define('SE_HELFLAG_AV', 65536); }
+if (!defined('SE_HELFLAG_AVKIND_VR')) { define('SE_HELFLAG_AVKIND_VR', 65536); }
+if (!defined('SE_HELFLAG_AVKIND_PTO')) { define('SE_HELFLAG_AVKIND_PTO', 131072); }
+if (!defined('SE_HELFLAG_AVKIND_MIN7')) { define('SE_HELFLAG_AVKIND_MIN7', 262144); }
+if (!defined('SE_HELFLAG_AVKIND_MIN9')) { define('SE_HELFLAG_AVKIND_MIN9', 524288); }
+if (!defined('SE_HELFLAG_AVKIND')) { define('SE_HELFLAG_AVKIND', 983040); }
+if (!defined('SE_HELIACAL_LONG_SEARCH')) { define('SE_HELIACAL_LONG_SEARCH', 128); }
+if (!defined('SE_HELIACAL_HIGH_PRECISION')) { define('SE_HELIACAL_HIGH_PRECISION', 256); }
+if (!defined('SE_HELIACAL_OPTICAL_PARAMS')) { define('SE_HELIACAL_OPTICAL_PARAMS', 512); }
+if (!defined('SE_HELIACAL_NO_DETAILS')) { define('SE_HELIACAL_NO_DETAILS', 1024); }
+if (!defined('SE_HELIACAL_SEARCH_1_PERIOD')) { define('SE_HELIACAL_SEARCH_1_PERIOD', 2048); }
+if (!defined('SE_HELIACAL_VISLIM_DARK')) { define('SE_HELIACAL_VISLIM_DARK', 4096); }
+if (!defined('SE_HELIACAL_VISLIM_NOMOON')) { define('SE_HELIACAL_VISLIM_NOMOON', 8192); }
+if (!defined('SE_HELIACAL_VISLIM_PHOTOPIC')) { define('SE_HELIACAL_VISLIM_PHOTOPIC', 16384); }
+if (!defined('SE_HELIACAL_AVKIND_VR')) { define('SE_HELIACAL_AVKIND_VR', 32768); }
+if (!defined('SE_HELIACAL_AVKIND_PTO')) { define('SE_HELIACAL_AVKIND_PTO', 65536); }
+if (!defined('SE_HELIACAL_AVKIND_MIN7')) { define('SE_HELIACAL_AVKIND_MIN7', 131072); }
+if (!defined('SE_HELIACAL_AVKIND_MIN9')) { define('SE_HELIACAL_AVKIND_MIN9', 262144); }
+if (!defined('SE_HELIACAL_AVKIND')) { define('SE_HELIACAL_AVKIND', 983040); }
+if (!defined('SE_PHOTOPIC_FLAG')) { define('SE_PHOTOPIC_FLAG', 0); }
+if (!defined('SE_SCOTOPIC_FLAG')) { define('SE_SCOTOPIC_FLAG', 1); }
+if (!defined('SE_MIXEDOPIC_FLAG')) { define('SE_MIXEDOPIC_FLAG', 2); }
+if (!defined('SE_TIDAL_DE200')) { define('SE_TIDAL_DE200', -23.8946); }
+if (!defined('SE_TIDAL_DE403')) { define('SE_TIDAL_DE403', -25.58); }
+if (!defined('SE_TIDAL_DE404')) { define('SE_TIDAL_DE404', -25.58); }
+if (!defined('SE_TIDAL_DE405')) { define('SE_TIDAL_DE405', -25.826); }
+if (!defined('SE_TIDAL_DE406')) { define('SE_TIDAL_DE406', -25.826); }
+if (!defined('SE_TIDAL_DE421')) { define('SE_TIDAL_DE421', -25.85); }
+if (!defined('SE_TIDAL_DE422')) { define('SE_TIDAL_DE422', -25.85); }
+if (!defined('SE_TIDAL_DE430')) { define('SE_TIDAL_DE430', -25.82); }
+if (!defined('SE_TIDAL_DE431')) { define('SE_TIDAL_DE431', -25.8); }
+if (!defined('SE_TIDAL_DE441')) { define('SE_TIDAL_DE441', -25.936); }
+if (!defined('SE_TIDAL_26')) { define('SE_TIDAL_26', -26.0); }
+if (!defined('SE_TIDAL_STEPHENSON_2016')) { define('SE_TIDAL_STEPHENSON_2016', -25.85); }
+if (!defined('SE_TIDAL_DEFAULT')) { define('SE_TIDAL_DEFAULT', -25.8); }
+if (!defined('SE_TIDAL_AUTOMATIC')) { define('SE_TIDAL_AUTOMATIC', 999999); }
+if (!defined('SE_TIDAL_MOSEPH')) { define('SE_TIDAL_MOSEPH', -25.58); }
+if (!defined('SE_TIDAL_SWIEPH')) { define('SE_TIDAL_SWIEPH', -25.8); }
+if (!defined('SE_TIDAL_JPLEPH')) { define('SE_TIDAL_JPLEPH', -25.8); }
+if (!defined('SE_DELTAT_AUTOMATIC')) { define('SE_DELTAT_AUTOMATIC', -1.0E-10); }
+if (!defined('SE_MODEL_DELTAT')) { define('SE_MODEL_DELTAT', 0); }
+if (!defined('SE_MODEL_PREC_LONGTERM')) { define('SE_MODEL_PREC_LONGTERM', 1); }
+if (!defined('SE_MODEL_PREC_SHORTTERM')) { define('SE_MODEL_PREC_SHORTTERM', 2); }
+if (!defined('SE_MODEL_NUT')) { define('SE_MODEL_NUT', 3); }
+if (!defined('SE_MODEL_BIAS')) { define('SE_MODEL_BIAS', 4); }
+if (!defined('SE_MODEL_JPLHOR_MODE')) { define('SE_MODEL_JPLHOR_MODE', 5); }
+if (!defined('SE_MODEL_JPLHORA_MODE')) { define('SE_MODEL_JPLHORA_MODE', 6); }
+if (!defined('SE_MODEL_SIDT')) { define('SE_MODEL_SIDT', 7); }
+if (!defined('SEMOD_NPREC')) { define('SEMOD_NPREC', 11); }
+if (!defined('SEMOD_PREC_IAU_1976')) { define('SEMOD_PREC_IAU_1976', 1); }
+if (!defined('SEMOD_PREC_LASKAR_1986')) { define('SEMOD_PREC_LASKAR_1986', 2); }
+if (!defined('SEMOD_PREC_WILL_EPS_LASK')) { define('SEMOD_PREC_WILL_EPS_LASK', 3); }
+if (!defined('SEMOD_PREC_WILLIAMS_1994')) { define('SEMOD_PREC_WILLIAMS_1994', 4); }
+if (!defined('SEMOD_PREC_SIMON_1994')) { define('SEMOD_PREC_SIMON_1994', 5); }
+if (!defined('SEMOD_PREC_IAU_2000')) { define('SEMOD_PREC_IAU_2000', 6); }
+if (!defined('SEMOD_PREC_BRETAGNON_2003')) { define('SEMOD_PREC_BRETAGNON_2003', 7); }
+if (!defined('SEMOD_PREC_IAU_2006')) { define('SEMOD_PREC_IAU_2006', 8); }
+if (!defined('SEMOD_PREC_VONDRAK_2011')) { define('SEMOD_PREC_VONDRAK_2011', 9); }
+if (!defined('SEMOD_PREC_OWEN_1990')) { define('SEMOD_PREC_OWEN_1990', 10); }
+if (!defined('SEMOD_PREC_NEWCOMB')) { define('SEMOD_PREC_NEWCOMB', 11); }
+if (!defined('SEMOD_PREC_DEFAULT')) { define('SEMOD_PREC_DEFAULT', 9); }
+if (!defined('SEMOD_PREC_DEFAULT_SHORT')) { define('SEMOD_PREC_DEFAULT_SHORT', 9); }
+if (!defined('SEMOD_NNUT')) { define('SEMOD_NNUT', 5); }
+if (!defined('SEMOD_NUT_IAU_1980')) { define('SEMOD_NUT_IAU_1980', 1); }
+if (!defined('SEMOD_NUT_IAU_CORR_1987')) { define('SEMOD_NUT_IAU_CORR_1987', 2); }
+if (!defined('SEMOD_NUT_IAU_2000A')) { define('SEMOD_NUT_IAU_2000A', 3); }
+if (!defined('SEMOD_NUT_IAU_2000B')) { define('SEMOD_NUT_IAU_2000B', 4); }
+if (!defined('SEMOD_NUT_WOOLARD')) { define('SEMOD_NUT_WOOLARD', 5); }
+if (!defined('SEMOD_NUT_DEFAULT')) { define('SEMOD_NUT_DEFAULT', 4); }
+if (!defined('SEMOD_NSIDT')) { define('SEMOD_NSIDT', 4); }
+if (!defined('SEMOD_SIDT_IAU_1976')) { define('SEMOD_SIDT_IAU_1976', 1); }
+if (!defined('SEMOD_SIDT_IAU_2006')) { define('SEMOD_SIDT_IAU_2006', 2); }
+if (!defined('SEMOD_SIDT_IERS_CONV_2010')) { define('SEMOD_SIDT_IERS_CONV_2010', 3); }
+if (!defined('SEMOD_SIDT_LONGTERM')) { define('SEMOD_SIDT_LONGTERM', 4); }
+if (!defined('SEMOD_SIDT_DEFAULT')) { define('SEMOD_SIDT_DEFAULT', 4); }
+if (!defined('SEMOD_NBIAS')) { define('SEMOD_NBIAS', 3); }
+if (!defined('SEMOD_BIAS_NONE')) { define('SEMOD_BIAS_NONE', 1); }
+if (!defined('SEMOD_BIAS_IAU2000')) { define('SEMOD_BIAS_IAU2000', 2); }
+if (!defined('SEMOD_BIAS_IAU2006')) { define('SEMOD_BIAS_IAU2006', 3); }
+if (!defined('SEMOD_BIAS_DEFAULT')) { define('SEMOD_BIAS_DEFAULT', 3); }
+if (!defined('SEMOD_NJPLHOR')) { define('SEMOD_NJPLHOR', 2); }
+if (!defined('SEMOD_JPLHOR_LONG_AGREEMENT')) { define('SEMOD_JPLHOR_LONG_AGREEMENT', 1); }
+if (!defined('SEMOD_JPLHOR_DEFAULT')) { define('SEMOD_JPLHOR_DEFAULT', 1); }
+if (!defined('SEMOD_NJPLHORA')) { define('SEMOD_NJPLHORA', 3); }
+if (!defined('SEMOD_JPLHORA_1')) { define('SEMOD_JPLHORA_1', 1); }
+if (!defined('SEMOD_JPLHORA_2')) { define('SEMOD_JPLHORA_2', 2); }
+if (!defined('SEMOD_JPLHORA_3')) { define('SEMOD_JPLHORA_3', 3); }
+if (!defined('SEMOD_JPLHORA_DEFAULT')) { define('SEMOD_JPLHORA_DEFAULT', 3); }
+if (!defined('SEMOD_NDELTAT')) { define('SEMOD_NDELTAT', 5); }
+if (!defined('SEMOD_DELTAT_STEPHENSON_MORRISON_1984')) { define('SEMOD_DELTAT_STEPHENSON_MORRISON_1984', 1); }
+if (!defined('SEMOD_DELTAT_STEPHENSON_1997')) { define('SEMOD_DELTAT_STEPHENSON_1997', 2); }
+if (!defined('SEMOD_DELTAT_STEPHENSON_MORRISON_2004')) { define('SEMOD_DELTAT_STEPHENSON_MORRISON_2004', 3); }
+if (!defined('SEMOD_DELTAT_ESPENAK_MEEUS_2006')) { define('SEMOD_DELTAT_ESPENAK_MEEUS_2006', 4); }
+if (!defined('SEMOD_DELTAT_STEPHENSON_ETC_2016')) { define('SEMOD_DELTAT_STEPHENSON_ETC_2016', 5); }
+if (!defined('SEMOD_DELTAT_DEFAULT')) { define('SEMOD_DELTAT_DEFAULT', 5); }
+if (!defined('SE_HOUSES_PLACIDUS')) { define('SE_HOUSES_PLACIDUS', 'P'); }
+if (!defined('SE_HOUSES_KOCH')) { define('SE_HOUSES_KOCH', 'K'); }
+if (!defined('SE_HOUSES_PORPHYRIUS')) { define('SE_HOUSES_PORPHYRIUS', 'O'); }
+if (!defined('SE_HOUSES_REGIOMONTANUS')) { define('SE_HOUSES_REGIOMONTANUS', 'R'); }
+if (!defined('SE_HOUSES_CAMPANO')) { define('SE_HOUSES_CAMPANO', 'C'); }
+if (!defined('SE_HOUSES_EQUAL')) { define('SE_HOUSES_EQUAL', 'E'); }
+if (!defined('SE_HOUSES_EQUAL_VEHIC')) { define('SE_HOUSES_EQUAL_VEHIC', 'V'); }
+if (!defined('SE_HOUSES_POLICH_PAGE')) { define('SE_HOUSES_POLICH_PAGE', 'T'); }
+if (!defined('SE_HOUSES_ALCABITUS')) { define('SE_HOUSES_ALCABITUS', 'B'); }
+if (!defined('SE_HOUSES_MORINUS')) { define('SE_HOUSES_MORINUS', 'M'); }
+if (!defined('SE_HOUSES_KRUSINSKI')) { define('SE_HOUSES_KRUSINSKI', 'U'); }
+if (!defined('OK')) { define('OK', 0); }
+if (!defined('ERR')) { define('ERR', -1); }
