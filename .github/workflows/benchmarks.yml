@@ -63,9 +63,7 @@ jobs:
             
             # Construct download URL (assuming x64 NTS which is standard for GH runners)
             # We use a robust PowerShell download
-            powershell <<'EOF'
-              $ver = "${{ steps.setup-php.outputs.php-version }}"
-              # Find exact version
+            powershell <<'POWERSHELL_EOF'
               $phpVer = (php -v)[0].Split(' ')[1]
               echo "Downloading Devel Pack for $phpVer..."
               $url = "https://windows.php.net/downloads/releases/php-devel-pack-$phpVer-Win32-vs16-x64.zip"
@@ -73,10 +71,9 @@ jobs:
                 Invoke-WebRequest -Uri $url -OutFile "php-devel.zip"
                 Expand-Archive -Path "php-devel.zip" -DestinationPath "php-sdk-root"
               } catch {
-                # Fallback to a broader search if exact version download fails
                 echo "Exact version pack not found. Building with FFI only."
               }
-EOF
+POWERSHELL_EOF
             
             if [ -d "php-sdk-root" ]; then
                 # Locate headers and libs in the extracted pack
