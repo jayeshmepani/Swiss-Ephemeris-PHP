@@ -35,63 +35,56 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Set up MSYS2 (Windows Only)
-        if: runner.os == 'Windows'
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: git mingw-w64-x86_64-gcc
-
-      - name: Compile C-Extension (Multi-Platform)
+      - name: Compile C-Extension (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           git clone --depth 1 -b 4.0.11 https://github.com/kevindecapite/php-sweph.git
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            echo "Building Traditional Windows C-Extension (kevindecapite/php-sweph)..."
-            cd php-sweph
-            mkdir -p sweph/src
-            
-            # Fetch fresh swisseph source needed for traditional build
-            git clone --depth 1 https://github.com/aloistr/swisseph.git swisseph_tmp
-            cp swisseph_tmp/src/*.c sweph/src/ 2>/dev/null || cp swisseph_tmp/*.c sweph/src/ 2>/dev/null || true
-            cp swisseph_tmp/src/*.h sweph/src/ 2>/dev/null || cp swisseph_tmp/*.h sweph/src/ 2>/dev/null || true
-            
-            # Download official PHP Devel Pack for headers and libs
-            PHP_VERSION=$(php -r 'echo PHP_VERSION;')
-            echo "Targeting PHP Version: $PHP_VERSION"
-            curl -L "https://windows.php.net/downloads/releases/php-devel-pack-$PHP_VERSION-Win32-vs16-x64.zip" -o php-devel.zip
-            rm -rf php-devel
-            mkdir php-devel
-            unzip -q php-devel.zip -d php-devel
-            
-            PHP_H=$(find "$PWD/php-devel" -type f -path "*/include/main/php.h" -print -quit)
-            if [ -z "$PHP_H" ]; then
-              echo "Could not find php.h in the extracted PHP devel pack"
-              find "$PWD/php-devel" -maxdepth 3 -type d -print
+          cd php-sweph && phpize && ./configure && make
+
+      - name: Compile C-Extension (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          git clone --depth 1 -b 4.0.11 https://github.com/kevindecapite/php-sweph.git
+
+          @'
+          // vim:ft=javascript
+
+          ARG_WITH("sweph", "for libswe support", "no");
+
+          if (PHP_SWEPH != "no") {
+              EXTENSION("swephp", "swephp.c", PHP_SWEPH_SHARED,
+                  "/I \"" + configure_module_dirname + "\\sweph\\src\" /DZEND_ENABLE_STATIC_TSRMLS_CACHE=1");
+
+              ADD_SOURCES(configure_module_dirname + "\\sweph\\src",
+                  "swedate.c swehouse.c swejpl.c swemmoon.c swemplan.c sweph.c swephlib.c swecl.c swehel.c",
+                  "swephp");
+
+              AC_DEFINE("HAVE_SWEPH", 1, "Define to 1 if the PHP extension 'swephp' is available.");
+          }
+          '@ | Set-Content -Path php-sweph\config.w32 -Encoding ASCII
+
+          Install-PackageProvider -Name NuGet -Force -Scope CurrentUser
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name BuildPhpExtension -Repository PSGallery -Force -Scope CurrentUser
+
+          $phpVersion = php -r "echo PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;"
+          $threadSafety = php -r "echo ZEND_THREAD_SAFE ? 'ts' : 'nts';"
+          Write-Host "Building php-sweph for PHP $phpVersion ($threadSafety, x64)"
+
+          Push-Location php-sweph
+          Invoke-PhpBuildExtension -PhpVersion $phpVersion -Arch x64 -Ts $threadSafety -Args "--with-sweph=shared"
+          Pop-Location
+
+          $dll = Get-ChildItem -Path php-sweph -Recurse -Filter php_swephp.dll | Select-Object -First 1
+          if (-not $dll) {
+              Write-Error "php_swephp.dll was not produced by the Windows extension build."
               exit 1
-            fi
-            INC_ROOT=$(cd "$(dirname "$PHP_H")/.." && pwd)
-            
-            # Determine if PHP is TS or NTS to pick the right .lib
-            LIB_FILE=$(find "$PWD/php-devel" -type f \( -name "php8.lib" -o -name "php8ts.lib" \) -print -quit)
-            if [ -z "$LIB_FILE" ]; then
-              echo "Could not find php8.lib or php8ts.lib in the extracted PHP devel pack"
-              find "$PWD/php-devel" -maxdepth 4 -type f -name "*.lib" -print
-              exit 1
-            fi
-            LIB_ROOT=$(dirname "$LIB_FILE")
-            LIB_NAME=$(basename "$LIB_FILE" .lib)
-            echo "Linking against: $LIB_NAME"
-            
-            # Compile the traditional extension shim
-            gcc -O2 -shared -I. -I"$INC_ROOT" -I"$INC_ROOT/main" -I"$INC_ROOT/TSRM" -I"$INC_ROOT/Zend" -I./sweph/src \
-                -DPHP_EXPORTS -DCOMPILE_DL_SWEPHP -DZEND_WIN32 -DPHP_WIN32 \
-                swephp.c sweph/src/*.c -o ../docs/benchmark/php_swephp.dll -L"$LIB_ROOT" -l$LIB_NAME
-            cd ..
-          else
-            cd php-sweph && phpize && ./configure && make
-          fi
+          }
+
+          Copy-Item -Path $dll.FullName -Destination docs\benchmark\php_swephp.dll -Force
+          php -d extension="$(Resolve-Path docs\benchmark\php_swephp.dll)" -m | Select-String -SimpleMatch "swephp"
 
       - name: Run Strict Audit
         shell: bash
