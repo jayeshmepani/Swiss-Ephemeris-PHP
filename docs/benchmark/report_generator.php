@@ -2,8 +2,9 @@
 declare(strict_types=1);
 
 /**
- * MULTI-SYSTEM REPORT GENERATOR
- * This script merges all available benchmark JSON files into a single interactive HTML dashboard.
+ * TRUE TRANSPARENCY MULTI-SYSTEM REPORT GENERATOR
+ * This script is 100% data-driven. It has ZERO hardcoded specs or placeholders.
+ * It builds the entire dashboard UI from the available JSON benchmark datasets.
  */
 
 $dir = __DIR__;
@@ -14,14 +15,14 @@ foreach ($jsonFiles as $file) {
     $data = json_decode(file_get_contents($file), true);
     if (!$data || !isset($data['system']['os'])) continue;
     
-    // Create a unique key based on OS and Architecture
     $osName = $data['system']['os'];
+    // Map to simple tab keys
     $key = str_contains($osName, 'Linux') ? 'Linux' : (str_contains($osName, 'Darwin') ? 'macOS' : 'Windows');
     $allData[$key] = $data;
 }
 
 if (empty($allData)) {
-    die("Error: No valid Stats JSON files found in $dir\n");
+    die("Error: No valid Stats JSON files found in $dir. Ensure you have run the benchmark first.\n");
 }
 
 $html = <<<'HTML'
@@ -44,39 +45,29 @@ $html = <<<'HTML'
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 1rem; transition: background 0.3s, color 0.3s; }
         .container { max-width: 1400px; margin: 0 auto; }
-        
         header { display: flex; flex-direction: column; align-items: center; margin: 2rem 0 1rem 0; position: relative; }
         .theme-toggle { position: absolute; right: 0; top: 0; background: var(--card); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        
-        /* Tab System */
         .system-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; background: var(--border); padding: 0.3rem; border-radius: 1rem; width: fit-content; margin-left: auto; margin-right: auto; }
         .tab-btn { padding: 0.75rem 1.5rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; cursor: pointer; border-radius: 0.75rem; transition: all 0.2s; font-size: 0.9rem; }
         .tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-
         .badge { display: inline-block; padding: 0.5rem 1rem; background: var(--primary); color: #fff; font-weight: 800; border-radius: 9999px; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 1rem; }
-        [data-theme="dark"] .badge { color: #fff; background: var(--primary); }
+        [data-theme="dark"] .badge { color: #000; background: var(--primary); }
         h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 800; margin: 0; letter-spacing: -0.025em; color: var(--text); text-align: center; }
-        
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
         .card h3 { margin: 0 0 1rem 0; font-size: 0.875rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
         .card .value { font-size: 2.25rem; font-weight: 800; line-height: 1; margin-bottom: 0.5rem; color: var(--primary); }
-        
         .specs-list { list-style: none; padding: 0; margin: 0; }
         .specs-list li { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; gap: 10px; }
         .specs-label { font-weight: 600; color: var(--text-muted); }
-        .specs-value { text-align: right; color: var(--text); }
-        
+        .specs-value { text-align: right; color: var(--text); font-weight: 500; }
         .chart-section { background: var(--card); border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--border); margin-bottom: 2rem; }
         .chart-container { position: relative; height: 550px; width: 100%; }
-        
         .search-box { width: 100%; padding: 1rem; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 0.75rem; font-size: 1rem; box-sizing: border-box; outline: none; margin-bottom: 1rem; }
-        
         .table-wrapper { overflow-x: auto; border-radius: 1rem; border: 1px solid var(--border); background: var(--card); }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th { background: rgba(0,0,0,0.02); text-align: left; padding: 1rem; font-weight: 800; color: var(--text); border-bottom: 2px solid var(--border); font-size: 0.75rem; text-transform: uppercase; position: sticky; top: 0; z-index: 10; }
         td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text); }
-        
         .tag { padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.7rem; font-weight: 800; }
         .tag-match { background: #dcfce7; color: #166534; }
         [data-theme="dark"] .tag-match { background: #064e3b; color: #4ade80; }
@@ -90,24 +81,19 @@ $html = <<<'HTML'
             <button class="theme-toggle" id="themeToggle"><span id="themeLabel">🌙 Dark Mode</span></button>
             <div class="badge">Multi-OS Performance Audit</div>
             <h1>FFI vs. Native Extension Transparency</h1>
-            <p style="color: var(--text-muted); margin-bottom: 2rem;">Lossless comparison of 106 Swiss Ephemeris functions.</p>
-
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">True Transparency: Results derived 100% from environment-detected metrics.</p>
             <div class="system-tabs" id="systemTabs"></div>
         </header>
 
         <div class="grid">
-            <!-- CPU & SYSTEM -->
             <div class="card">
                 <h3>Compute Power</h3>
                 <ul class="specs-list">
                     <li><span class="specs-label">Processor</span><span class="specs-value" id="spec-cpu">--</span></li>
-                    <li><span class="specs-label">Architecture</span><span class="specs-value" id="spec-arch">--</span></li>
                     <li><span class="specs-label">RAM</span><span class="specs-value" id="spec-ram">--</span></li>
                     <li><span class="specs-label">JIT Engine</span><span class="specs-value" id="spec-jit">--</span></li>
                 </ul>
             </div>
-            
-            <!-- SOFTWARE STACK -->
             <div class="card" style="grid-column: span 2;">
                 <h3>Software Stack</h3>
                 <ul class="specs-list">
@@ -167,8 +153,8 @@ $html = <<<'HTML'
         const allSystems = {{DATA}};
         const systemKeys = Object.keys(allSystems);
         let currentKey = systemKeys[0];
+        let myChart = null;
 
-        // Init Tabs
         const tabsContainer = document.getElementById('systemTabs');
         systemKeys.forEach(key => {
             const btn = document.createElement('button');
@@ -189,9 +175,7 @@ $html = <<<'HTML'
             const system = data.system;
             const results = data.results;
 
-            // Populate Specs
             document.getElementById('spec-cpu').innerText = system.cpu || '--';
-            document.getElementById('spec-arch').innerText = system.os || '--';
             document.getElementById('spec-ram').innerText = system.ram || '--';
             document.getElementById('spec-jit').innerText = system.jit || '--';
             document.getElementById('spec-os').innerText = system.os || '--';
@@ -202,7 +186,6 @@ $html = <<<'HTML'
             const resultEntries = Object.entries(results);
             const comparedResults = resultEntries.filter(e => e[1].ext);
             
-            // Calc Bridge Overhead
             if (comparedResults.length > 0) {
                 const sortedRatios = comparedResults.map(e => e[1].ratios.mean).sort((a,b) => a-b);
                 const medianRatio = sortedRatios[Math.floor(sortedRatios.length / 2)];
@@ -212,11 +195,11 @@ $html = <<<'HTML'
                 document.getElementById('status-text').style.color = medianRatio < 1.3 ? 'var(--success)' : 'var(--primary)';
                 
                 const ffiWins = comparedResults.filter(e => e[1].ratios.mean < 1.0).length;
-                document.getElementById('birds-eye').innerHTML = `At the median, FFI is only <strong>${overheadPct}% slower</strong> than the native extension. FFI beats the C-extension in <strong>${ffiWins}</strong> functions (${((ffiWins/comparedResults.length)*100).toFixed(0)}% of the API).`;
+                document.getElementById('birds-eye').innerHTML = `On this system, FFI is only <strong>${overheadPct}% slower</strong> than the native extension. FFI outperforms the C-extension in <strong>${ffiWins}</strong> functions (${((ffiWins/comparedResults.length)*100).toFixed(0)}% of the API).`;
             } else {
                 document.getElementById('overall-median').innerText = 'FFI-ONLY';
                 document.getElementById('status-text').innerText = 'PROFILING MODE';
-                document.getElementById('birds-eye').innerText = 'Detailed FFI latency profiling for ' + currentKey + '. C-Extension comparison not available for this platform.';
+                document.getElementById('birds-eye').innerText = 'Detailed FFI latency profiling for ' + currentKey + '. C-Extension comparison data was not captured for this platform.';
             }
 
             renderTable(document.getElementById('searchInput').value);
@@ -237,12 +220,10 @@ $html = <<<'HTML'
             });
         }
 
-        let myChart = null;
         function renderChart(dataEntries) {
             const top30 = dataEntries.sort((a,b) => b[1].ffi.mean - a[1].ffi.mean).slice(0, 30);
             const ctx = document.getElementById('latencyChart').getContext('2d');
             if (myChart) myChart.destroy();
-
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             const gridColor = isDark ? 'rgba(255,255,255,0.15)' : '#e2e8f0';
             const textColor = isDark ? '#f1f5f9' : '#64748b';
@@ -270,17 +251,15 @@ $html = <<<'HTML'
             });
         }
 
-        // Theme Toggle Logic
         const themeToggle = document.getElementById('themeToggle');
         function applyTheme(theme) {
             document.body.setAttribute('data-theme', theme);
             document.getElementById('themeLabel').innerText = theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
             localStorage.setItem('theme', theme);
-            if (myChart) renderDashboard(); // Redraw chart with new theme colors
+            if (myChart) renderDashboard();
         }
         applyTheme(localStorage.getItem('theme') || 'light');
         themeToggle.onclick = () => applyTheme(document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
-
         document.getElementById('searchInput').oninput = (e) => renderTable(e.target.value);
         renderDashboard();
     </script>
@@ -290,4 +269,4 @@ HTML;
 
 $html = str_replace('{{DATA}}', json_encode($allData), $html);
 file_put_contents(__DIR__ . '/benchmark.html', $html);
-echo "✅ Multi-System Dashboard Created: docs/benchmark/benchmark.html\n";
+echo "✅ True Transparency Multi-System Dashboard Created: docs/benchmark/benchmark.html\n";

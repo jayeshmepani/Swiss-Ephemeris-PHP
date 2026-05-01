@@ -35,11 +35,18 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Compile C-Extension (Ubuntu & macOS)
-        if: runner.os != 'Windows'
+      - name: Compile C-Extension (Multi-Platform)
+        shell: bash
         run: |
-          git clone -b 4.0.11 https://github.com/kevindecapite/php-sweph.git
-          cd php-sweph && phpize && ./configure && make
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            # Windows native build is complex; we use a prebuilt DLL if available or skip
+            # For now, we focus on FFI perfection on Windows.
+            # Building on Windows in CI requires 10+ minutes of SDK setup.
+            echo "Skipping Windows C-Ext build to focus on FFI Lossless Profiling"
+          else
+            git clone --depth 1 -b 4.0.11 https://github.com/kevindecapite/php-sweph.git
+            cd php-sweph && phpize && ./configure && make
+          fi
 
       - name: Run Strict Audit
         shell: bash

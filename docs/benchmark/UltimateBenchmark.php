@@ -205,13 +205,23 @@ class UltimateBenchmark
             $ram = shell_exec("sysctl -n hw.memsize | awk '{print $1/1024/1024/1024 \" GB\"}'") ?: 'Unknown';
         } elseif ($os === 'Windows') {
             try {
-                $cpu = shell_exec("echo %PROCESSOR_IDENTIFIER%") ?: 'Windows CPU';
-                $ram = '7 GB (GitHub Runner)'; // Standard GH runner RAM
+                $cpu = shell_exec("wmic cpu get name /value") ?: '';
+                $cpu = trim(str_replace('Name=', '', $cpu));
+                if (empty($cpu)) $cpu = getenv('PROCESSOR_IDENTIFIER') ?: 'Windows CPU';
+
+                $ram = shell_exec("powershell -command \"(Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB\"") ?: '';
+                $ram = !empty($ram) ? round((float)$ram) . ' GB' : '7 GB (GitHub Runner)';
             } catch (\Throwable $e) {
                 $cpu = 'Windows Virtual CPU';
                 $ram = 'Unknown';
             }
         }
+
+        $libVersion = 'Unknown';
+        try {
+            $this->ffi->swe_version($this->s1);
+            $libVersion = \FFI::string($this->s1);
+        } catch (\Throwable $e) {}
 
         return [
             'php' => phpversion(),
@@ -220,7 +230,7 @@ class UltimateBenchmark
             'ram' => trim($ram),
             'jit' => function_exists('opcache_get_status') && (opcache_get_status()['jit']['enabled'] ?? false) ? 'Enabled' : 'Disabled',
             'date' => date('Y-m-d H:i:s'),
-            'library' => 'Swiss Ephemeris 2.10.03 (v2.10.3final)'
+            'library' => 'Swiss Ephemeris ' . $libVersion
         ];
     }
     private function benchBoth(string $name, array $args, int $n, int $w): void
@@ -309,9 +319,11 @@ class UltimateBenchmark
                 }
             }
 
+            // Strict 100 warmup iterations
             for ($i=0; $i<$w; $i++) @$name(...$ext_args);
 
             $times = []; $m0 = memory_get_usage(true);
+            // Strict 1000 measurement iterations
             for ($i=0; $i<$n; $i++) {
                 $t0 = hrtime(true);
                 $last_res = @$name(...$ext_args);
