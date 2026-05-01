@@ -78,6 +78,14 @@ jobs:
       - name: Generate Unified HTML
         run: php docs/benchmark/report_generator.php
 
+      - name: Commit & Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/benchmark/benchmark.html docs/benchmark/*.json
+          git commit -m "chore: update multi-os performance audit results [skip ci]" || echo "No changes to commit"
+          git push
+
       - name: Upload Final Audit Dashboard
         uses: actions/upload-artifact@v4
         with:
